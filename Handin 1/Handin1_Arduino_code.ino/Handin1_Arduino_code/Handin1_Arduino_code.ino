@@ -127,7 +127,7 @@ void loop() {
 
   // Nothing to do in the loop for now
   int current_time = millis();
-  if((current_time -last_measurement) >= 5000){
+  if((current_time -last_measurement) >= 60000){ //60.000ms = 1 secons
     i = i+1;
     measure_and_update();
     last_measurement = current_time;
