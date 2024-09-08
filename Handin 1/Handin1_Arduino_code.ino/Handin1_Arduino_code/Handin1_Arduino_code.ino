@@ -25,10 +25,8 @@ int label_TVOC_min[] = {3,170};
 int label_TVOC_max[] = {3,190};
 int label_num_meaure[] = {3,210};
 
-// Define the background color 
-uint16_t backgroundColor = BLACK;
-uint16_t textColor = WHITE; // Default text color (white)
-bool isWhiteBackground = false;   // Initially set to false (black background)
+// Define the display status
+bool is_display_off = false;
 
 
 // Define the start time
@@ -41,7 +39,7 @@ void write_to_screen(int* label, const char* msg, int text_size) {
   int y_cord = label[1];
   M5.Lcd.setCursor(x_cord, y_cord); // Set cursor to the top-left corner of the screen
   M5.Lcd.setTextSize(text_size);
-  M5.Lcd.setTextColor(textColor); // Set the text color
+  M5.Lcd.setTextColor(WHITE); // Set the text color
   M5.Lcd.print(msg);
 
 }
@@ -78,7 +76,7 @@ void measureAirQuality(){
 
 
 void update_display(){
-  M5.Lcd.fillScreen(backgroundColor); // Fills the entire screen with black color
+  M5.Lcd.fillScreen(BLACK); // Fills the entire screen with black color
   write_to_screen(label_Co2_title, "Co2", 3);
   write_to_screen(label_TVOC_title, "TVOC", 3);
 
@@ -93,7 +91,7 @@ void update_display(){
 }
 
 void measure_and_update(){
-  M5.Lcd.fillScreen(backgroundColor); // Clear the screen with black color
+  M5.Lcd.fillScreen(BLACK); // Clear the screen with black color
   measureAirQuality();
   update_display();
 }
@@ -113,16 +111,16 @@ void loop() {
 
   if (M5.BtnA.wasPressed()) {
     // Toggle between white and black background
-    if (isWhiteBackground) {
-      backgroundColor = BLACK;
-      textColor = WHITE;
+    if (!is_display_off) {
+      is_display_off = true;
+      M5.Axp.ScreenBreath(0);     
     } else {
-      backgroundColor = WHITE;
-      textColor = BLACK;
+      is_display_off = false;
+      M5.Axp.ScreenBreath(99);     
+      update_display(); // Update the screen with the new colors
     }
 
-    isWhiteBackground = !isWhiteBackground; // Toggle the flag
-    update_display(); // Update the screen with the new colors
+    //is_display_off = !is_display_off; // Toggle the flag
   }
 
   // Nothing to do in the loop for now
