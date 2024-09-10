@@ -55,10 +55,20 @@
 .d-flex{
     display: flex !important;
     justify-content: center;
-    width: 100%;
+
 }
 
 .error-text{
     color:red;
     font-weight: bold;
+}
+
+.grid{
+    display: grid;
+    grid-template-columns: auto auto auto;
+}
+
+.grid-item{
+    width: 50%;
+
 }

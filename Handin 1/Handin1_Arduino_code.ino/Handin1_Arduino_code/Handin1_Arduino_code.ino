@@ -1,7 +1,13 @@
 #include <Adafruit_SGP30.h>
 #include <M5StickCPlus.h>
+#include <M5_EzData.h>
 
 Adafruit_SGP30 sgp;
+
+
+const char* ssid     = "AU-Gadget";
+const char* password = "augadget";
+const char* token    = "4f010319125c4afba13a083f175f62b0";
 
 // Define a struct to hold the CO2 and TVOC values
 struct AirQualityData {
@@ -54,7 +60,6 @@ AirQualityData airData = {
 };
 
 void measureAirQuality(){
-
   if (sgp.IAQmeasure()) {
     airData.current_Co2 = sgp.eCO2;
     airData.current_TVOC = sgp.TVOC;
@@ -63,7 +68,6 @@ void measureAirQuality(){
     if (airData.current_Co2 < airData.min_Co2) airData.min_Co2 = airData.current_Co2;
     if (airData.current_Co2 > airData.max_Co2) airData.max_Co2 = airData.current_Co2;
     
-
     // Update the minimum and maximum TVOC values
     if (airData.current_TVOC < airData.min_TVOC) airData.min_TVOC = airData.current_TVOC;
     if (airData.current_TVOC > airData.max_TVOC) airData.max_TVOC = airData.current_TVOC;
@@ -86,20 +90,33 @@ void update_display(){
   write_to_screen(label_TVOC_now, ("Now: " + String(airData.current_TVOC)).c_str(), 2);
   write_to_screen(label_TVOC_min, ("Min: " + String(airData.min_TVOC)).c_str(), 2);
   write_to_screen(label_TVOC_max, ("Max: " + String(airData.max_TVOC)).c_str(), 2);
-  write_to_screen(label_num_meaure, ("#: " + String(i)).c_str(), 1);
-  
+  write_to_screen(label_num_meaure, ("#: " + String(i)).c_str(), 1);  
 }
+
+void sendData(){
+  setData(token, "test", airData.current_Co2);
+  setData(token, "tvoc_mesurement", airData.current_Co2);
+}
+
 
 void measure_and_update(){
   M5.Lcd.fillScreen(BLACK); // Clear the screen with black color
   measureAirQuality();
   update_display();
+  sendData();
 }
+
+
+
 
 void setup() {
   Serial.begin(38400);
   // Initialize the M5StickC-Plus
   M5.begin();
+
+  if (!setupWifi(ssid, password)) {  // Connect to wifi.  连接到wifi
+    M5.Lcd.printf("Connecting to %s failed\n", ssid);
+  }
   sgp.begin();
   M5.Lcd.setRotation(0); // Set screen rotation if necessary
   measure_and_update();
@@ -119,13 +136,21 @@ void loop() {
       M5.Axp.ScreenBreath(99);     
       update_display(); // Update the screen with the new colors
     }
-
-    //is_display_off = !is_display_off; // Toggle the flag
+    int Array[3] = {};
+    if (getData(token, "testList", Array, 0, 3)) {
+        M5.Lcd.print("Success get list\n");
+        for (int i = 0; i < 3; i++) {
+            M5.Lcd.printf("Array[%d]=%d,", i, Array[i]);
+        }
+        M5.Lcd.println("");
+    } else {
+        M5.Lcd.println("Fail to get data");
+    }
   }
+  delay(5000);
 
-  // Nothing to do in the loop for now
   int current_time = millis();
-  if((current_time -last_measurement) >= 60000){ //60.000ms = 1 secons
+  if((current_time -last_measurement) >= 5000){ //60.000ms = 1 secons
     i = i+1;
     measure_and_update();
     last_measurement = current_time;
