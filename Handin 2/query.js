@@ -23,7 +23,7 @@ async function QueryFunction(){
         
     }
     catch{
-        PrintTableData(false, null);
+        PrintTableData();
     }
 
     queryTime.innerHTML = `${new Date()}`;
@@ -44,7 +44,7 @@ function PrintTableData(successfulQuery = false, jsonData){
     for(const key in jsonData){
         //code comes here
 
-        content += `<tr><td>${}</td><td>${}</td><td>${}</td></tr>`;
+        // content += `<tr><td>${}</td><td>${}</td><td>${}</td></tr>`;
     }
 
     table.innerHTML = content;
