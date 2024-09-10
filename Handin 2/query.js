@@ -13,9 +13,13 @@ async function QueryFunction(){
 
     queryTime.innerHTML = "Loading...";
 
+    let success = false;
+
     try{
         
         const resAwaitbale = await fetch("https://ezdata2.m5stack.com/api/v2/<owndata>");
+
+        success = resAwaitbale.ok;
     
         const jsonData = await resAwaitbale.json();
             
@@ -26,7 +30,7 @@ async function QueryFunction(){
         PrintTableData();
     }
 
-    queryTime.innerHTML = ` ${(new Date()).toLocaleString()}`;
+    queryTime.innerHTML = ` ${(new Date()).toLocaleString()} ${success ? "✅" : "❌"}`;
 }
 
 function PrintTableData(successfulQuery = false, jsonData){
