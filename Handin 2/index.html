@@ -1,78 +1,81 @@
 <!DOCTYPE html>
 <html lang="en">
-
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Document</title>
-    <link rel="stylesheet" href="./style.css">
-</head>
+    <link rel="stylesheet" href="./style.css" />
+  </head>
 
-<body>
+  <body>
     <div class="container">
-        <div>
-            <h6 class="text-muted">Last Queried:<span id="lastQueryTime"></span></h6>
-        </div>
-        <div class="d-flex">
-            <table class="styled-table">
+      <div>
+        <h6 class="text-muted">
+          Last Queried:<span id="lastQueryTime"></span>
+        </h6>
+      </div>
+      <div class="d-flex">
+        <table class="styled-table">
+          <thead>
+            <tr>
+              <th></th>
+              <th>Co2</th>
+              <th>TVOC</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+          <tbody>
+            <tr>
+              <th>Current</th>
+              <td id="now_co2"></td>
+              <td id="now_TVOC"></td>
+            </tr>
+            <tr>
+              <th>Min</th>
+              <td id="min_co2"></td>
+              <td id="min_TVOC"></td>
+            </tr>
+            <tr>
+              <th>Max</th>
+              <td id="max_co2"></td>
+              <td id="max_TVOC"></td>
+            </tr>
+          </tbody>
+          <tr></tr>
+        </table>
+      </div>
+      <div class="d-flex">
+        <table>
+          <tr class="align-top">
+            <td>
+              <table class="styled-table">
                 <thead>
-                    <tr>
-                        <th></th>
-                        <th>Co2</                   
-                            th>
-                        <th>TVOC</th>
-                    </tr>
+                  <tr>
+                    <th>Recorded Time</th>
+                    <th>Recorded Type</th>
+                    <th>Recorded Value</th>
+                  </tr>
                 </thead>
-                <tbody>
-                <tbody>
-                    <tr>
-                        <th>Current</th>
-                        <td id = "now_co2"></td>
-                        <td id = "now_TVOC"></td>
-                    </tr>
-                    <tr>
-                        <th>Min</th>
-                        <td id = "min_co2"></td>
-                        <td id = "min_TVOC"></td>
-                    </tr>
-                    <tr>
-                        <th>Max</th>
-                        <td id = "max_co2"></td>
-                        <td id = "max_TVOC"></td>
-                    </tr>
-                </tbody>
-                <tr>
-            </table>
-        </div>
-        <div clas="row">
-            <div class="col">
-                <table class="styled-table">
-                    <thead>
-                        <tr>
-                            <th>Recorded Time</th>
-                            <th>Recorded Type</th>
-                            <th>Recorded Value</th>
-                        </tr>
-                    </thead>
-                    <tbody id="tableBodyCo2"></tbody>
-                </table>
-            </div>
-            <div class="col">
-                <table class="styled-table">
-                    <thead>
-                        <tr>
-                            <th>Recorded Time</th>
-                            <th>Recorded Type</th>
-                            <th>Recorded Value</th>
-                        </tr>
-                    </thead>
-                    <tbody id="tableBodyTVOC"></tbody>
-                </table>
-            </div>
-        </div>
+                <tbody id="tableBodyCo2"></tbody>
+              </table>
+            </td>
+            <td>
+              <table class="styled-table">
+                <thead>
+                  <tr>
+                    <th>Recorded Time</th>
+                    <th>Recorded Type</th>
+                    <th>Recorded Value</th>
+                  </tr>
+                </thead>
+                <tbody id="tableBodyTVOC"></tbody>
+              </table>
+            </td>
+          </tr>
+        </table>
+      </div>
     </div>
-</body>
+  </body>
 
-<script type="text/javascript" src="./query.js"></script>
-
+  <script type="text/javascript" src="./query.js"></script>
 </html>
