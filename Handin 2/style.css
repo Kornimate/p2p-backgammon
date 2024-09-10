@@ -1,9 +1,8 @@
 /*code comes here*/
 
 .container{
-    display: flex;
+    display: block;
     width: 100%;
-    justify-content: center;
     padding: 10px;
     text-align: center;
 }
@@ -43,4 +42,14 @@
 .styled-table tbody tr.active-row {
     font-weight: bold;
     color: #009879;
+}
+
+.text-muted{
+    color: gray;
+}
+
+.d-flex{
+    display: flex !important;
+    justify-content: center;
+    width: 100%;
 }
