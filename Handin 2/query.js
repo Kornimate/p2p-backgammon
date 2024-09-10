@@ -26,7 +26,7 @@ async function QueryFunction(){
         PrintTableData();
     }
 
-    queryTime.innerHTML = `${new Date()}`;
+    queryTime.innerHTML = ` ${(new Date()).toLocaleString()}`;
 }
 
 function PrintTableData(successfulQuery = false, jsonData){
