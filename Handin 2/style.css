@@ -27,6 +27,10 @@
     padding: 12px 15px;
 }
 
+.styled-table thead {
+    border-radius: 10px;
+}
+
 .styled-table tbody tr {
     border-bottom: 1px solid #dddddd;
 }
@@ -52,4 +56,9 @@
     display: flex !important;
     justify-content: center;
     width: 100%;
+}
+
+.error-text{
+    color:red;
+    font-weight: bold;
 }
