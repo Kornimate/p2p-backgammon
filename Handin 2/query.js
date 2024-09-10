@@ -41,11 +41,9 @@ function PrintTableData(successfulQuery = false, jsonData){
 
     let content = "";
 
-    for(const key in jsonData){
-        //code comes here
-
-        // content += `<tr><td>${}</td><td>${}</td><td>${}</td></tr>`;
-    }
+    jsonData.forEach(item => {        
+        content += `<tr><td>${item?.time}</td><td>${item?.type}</td><td>${item?.value}</td></tr>`;
+    });
 
     table.innerHTML = content;
 }
