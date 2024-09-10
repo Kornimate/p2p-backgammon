@@ -1,68 +1,71 @@
 /*code comes here*/
 
-.container{
-    display: block;
-    width: 100%;
-    padding: 10px;
-    text-align: center;
+.container {
+  display: block;
+  width: 100%;
+  padding: 10px;
+  text-align: center;
 }
 
 .styled-table {
-    border-collapse: collapse;
-    margin: 25px 0;
-    font-size: 0.9em;
-    font-family: sans-serif;
-    min-width: 400px;
-    box-shadow: 0 0 20px rgba(0, 0, 0, 0.15);
-    width: 80%;
+  border-collapse: collapse;
+  margin: 25px 0;
+  font-size: 0.9em;
+  font-family: sans-serif;
+  min-width: 400px;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.15);
+  width: 80%;
 }
 
 .styled-table thead tr {
-    background-color: blue;
-    color: #ffffff;
+  background-color: blue;
+  color: #ffffff;
 }
 
 .styled-table th,
 .styled-table td {
-    padding: 12px 15px;
+  padding: 12px 15px;
 }
 
 .styled-table thead {
-    border-radius: 10px;
+  border-radius: 10px;
 }
 
 .styled-table tbody tr {
-    border-bottom: 1px solid #dddddd;
+  border-bottom: 1px solid #dddddd;
 }
 
 .styled-table tbody tr:nth-of-type(even) {
-    background-color: #f3f3f3;
+  background-color: #f3f3f3;
 }
 
 .styled-table tbody tr:last-of-type {
-    border-bottom: 2px solid blue;
+  border-bottom: 2px solid blue;
 }
 
 .styled-table tbody tr.active-row {
-    font-weight: bold;
-    color: #009879;
+  font-weight: bold;
+  color: #009879;
 }
 
-.text-muted{
-    color: gray;
+.text-muted {
+  color: gray;
 }
 
-.d-flex{
-    display: flex !important;
-    justify-content: center;
-
+.d-flex {
+  display: flex !important;
+  justify-content: center;
 }
 
-.error-text{
-    color:red;
-    font-weight: bold;
+.error-text {
+  color: red;
+  font-weight: bold;
 }
 
-.align-top{
-    vertical-align: top;
+.align-top {
+  vertical-align: top;
+}
+
+.align-middle {
+  margin: auto;
 }
