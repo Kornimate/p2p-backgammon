@@ -1,7 +1,8 @@
 package models
 
 type Measurement struct {
-	CreatedDate string
-	Type        string
-	Value       float64
+	Id             int     `json: "id"`
+	CreatedDate    string  `json: "createdDate"`
+	MeasuremenType string  `json: "measurementType"`
+	Value          float64 `json: "value"`
 }

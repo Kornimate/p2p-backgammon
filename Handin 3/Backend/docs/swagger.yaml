@@ -1,0 +1,52 @@
+definitions:
+  models.Measurement:
+    properties:
+      createdDate:
+        type: string
+      id:
+        type: integer
+      measuremenType:
+        type: string
+      value:
+        type: number
+    type: object
+info:
+  contact: {}
+paths:
+  /sensors/air-quality/co2:
+    get:
+      consumes:
+      - application/json
+      description: Gets the latest Co2 measurement from the database
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Measurement'
+        "500":
+          description: Internal Server Error
+          schema: {}
+      summary: Get latest Co2 measurement
+      tags:
+      - /sensors/air-quality
+  /sensors/air-quality/voc:
+    get:
+      consumes:
+      - application/json
+      description: Gets the latest VOC measurement from the database
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Measurement'
+        "500":
+          description: Internal Server Error
+          schema: {}
+      summary: Get latest VOC measurement
+      tags:
+      - /sensors/air-quality
+swagger: "2.0"
