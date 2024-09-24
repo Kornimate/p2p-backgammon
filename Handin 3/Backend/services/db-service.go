@@ -18,7 +18,7 @@ var db *sql.DB
 func EstablishDatabaseConnection() (bool, error) {
 	var err error
 
-	db, err = sql.Open("sqlite", "database.db")
+	db, err = sql.Open("sqlite3", "database.db")
 
 	if err != nil {
 		return false, err
@@ -54,11 +54,26 @@ func GetLatestVOC() (Model.Measurement, error) {
 func getLatestValue(v_type string) (Model.Measurement, error) {
 	var measurement Model.Measurement
 
-	row := db.QueryRow("select * from measurements where created_date in (select max(created_date) from measurements where measurement_type = ?);", v_type)
+	row := db.QueryRow("select * from measurements where created_time in (select max(created_time) from measurements where measurement_type = ?);", v_type)
 
 	if err := row.Scan(&measurement.Id, &measurement.CreatedDate, &measurement.MeasuremenType, &measurement.Value); err != nil {
-		return measurement, fmt.Errorf("Error while getting value (%v) %v", v_type, err)
+		return measurement, fmt.Errorf("error while getting value (%v) %v", v_type, err)
 	}
 
 	return measurement, nil
+}
+
+func InsertNewValue(newItem Model.Measurement) (bool, error) {
+
+	_, err := db.Exec("INSERT INTO measurements (created_time,measurement_type,value) values (?,?,?)", newItem.CreatedDate, newItem.MeasuremenType, newItem.Value)
+
+	if err != nil {
+		fmt.Printf("Error while inserting value %v\n", err)
+
+		return false, fmt.Errorf("error while inserting value %v", err)
+	}
+
+	fmt.Println("Value added")
+
+	return true, nil
 }

@@ -15,7 +15,7 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
-        "/sensors/air-quality/co2": {
+        "/api/v1/sensors/air-quality/co2": {
             "get": {
                 "description": "Gets the latest Co2 measurement from the database",
                 "consumes": [
@@ -25,7 +25,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "/sensors/air-quality"
+                    "GET API Endpoints"
                 ],
                 "summary": "Get latest Co2 measurement",
                 "responses": {
@@ -42,7 +42,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/sensors/air-quality/voc": {
+        "/api/v1/sensors/air-quality/voc": {
             "get": {
                 "description": "Gets the latest VOC measurement from the database",
                 "consumes": [
@@ -52,7 +52,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "/sensors/air-quality"
+                    "GET API Endpoints"
                 ],
                 "summary": "Get latest VOC measurement",
                 "responses": {
@@ -61,6 +61,46 @@ const docTemplate = `{
                         "schema": {
                             "$ref": "#/definitions/models.Measurement"
                         }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {}
+                    }
+                }
+            }
+        },
+        "/led-state/{on}": {
+            "put": {
+                "description": "Change led state on IoT device",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "PUT API Endpoints"
+                ],
+                "summary": "Change led state on IoT device",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "State of led, 0 = off, 1 = on",
+                        "name": "on",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {}
                     },
                     "500": {
                         "description": "Internal Server Error",
@@ -80,7 +120,7 @@ const docTemplate = `{
                 "id": {
                     "type": "integer"
                 },
-                "measuremenType": {
+                "measurementType": {
                     "type": "string"
                 },
                 "value": {
