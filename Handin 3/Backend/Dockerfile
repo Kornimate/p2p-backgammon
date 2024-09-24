@@ -12,20 +12,18 @@ COPY models/ /app/models
 
 COPY services/ /app/services
 
-RUN go install github.com/swaggo/swag/cmd/swag@latest
-
 RUN go mod download
 
 RUN go mod tidy
 
-# RUN sudo apt-get install -y sqlite3
+RUN apk update && apk upgrade && apk add --no-cache sqlite
 
 RUN touch database.db
 
-RUN go build -o /server 
+RUN go build -o api-app
 
 ENV ENV=Test
 
 EXPOSE 8080
 
-CMD ["/server"]
+CMD ["./api-app"]

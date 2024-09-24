@@ -1,7 +1,7 @@
 package main
 
 import (
-	_ "fmt"
+	"fmt"
 	Service "iot/main/services"
 	"net/http"
 	_ "os"
@@ -15,13 +15,13 @@ import (
 
 func main() {
 
-	// success, err := Service.EstablishDatabaseConnection()
+	success, err := Service.EstablishDatabaseConnection()
 
-	// if !success {
-	// 	fmt.Printf("Error while initializing database! %v", err)
+	if !success {
+		fmt.Printf("Error while initializing database! %v", err)
 
-	// 	return
-	// }
+		return
+	}
 
 	router := gin.Default()
 
@@ -35,7 +35,7 @@ func main() {
 
 	}
 
-	docs.SwaggerInfo.Title = "Swagger Iot API"
+	docs.SwaggerInfo.Title = "Swagger IoT API"
 	docs.SwaggerInfo.Description = "This is a cloud hosted api for IoT course assignment"
 	docs.SwaggerInfo.Version = "1.0"
 	docs.SwaggerInfo.Schemes = []string{"http", "https"}

@@ -18,7 +18,7 @@ var db *sql.DB
 func EstablishDatabaseConnection() (bool, error) {
 	var err error
 
-	db, err = sql.Open("sqlite3", "database.db")
+	db, err = sql.Open("sqlite", "database.db")
 
 	if err != nil {
 		return false, err
