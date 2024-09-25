@@ -28,12 +28,14 @@ func main() {
 
 	router := gin.Default()
 
+	router.Use(CORSMiddleware())
+
 	v1 := router.Group("/api/v1")
 	{
 		group := v1.Group("/sensors/air-quality")
 		{
 			group.GET("/co2", GetCO2)
-			group.GET("/voc", GetVOC)
+			group.GET("/tvoc", GetTVOC)
 		}
 
 	}
@@ -47,12 +49,6 @@ func main() {
 	router.GET("/", RedirectHandler)
 
 	router.PUT("/led-state/:on", LedHandler)
-
-	router.GET("/testnewmember", func(context *gin.Context) {
-		service.PublishToTopicTest("2002-10-10,tvoc,1.9")
-
-		context.IndentedJSON(http.StatusOK, "New Member added")
-	})
 
 	router.Run(":8080")
 }
@@ -79,16 +75,16 @@ func GetCO2(context *gin.Context) {
 }
 
 // GetVOC
-// @Summary      Get latest VOC measurement
+// @Summary      Get latest TVOC measurement
 // @Description  Gets the latest VOC measurement from the database
 // @Tags         GET API Endpoints
 // @Accept       json
 // @Produce      json
 // @Success      200  {object}  models.Measurement
 // @Failure      500  {object}  error
-// @Router       /api/v1/sensors/air-quality/voc [get]
-func GetVOC(context *gin.Context) {
-	value, err := service.GetLatestVOC()
+// @Router       /api/v1/sensors/air-quality/tvoc [get]
+func GetTVOC(context *gin.Context) {
+	value, err := service.GetLatestTVOC()
 
 	if err != nil {
 		context.IndentedJSON(http.StatusInternalServerError, err)
@@ -128,6 +124,22 @@ func LedHandler(context *gin.Context) {
 	service.PublishToTopic(state)
 
 	context.IndentedJSON(http.StatusNoContent, "Message pusblished")
+}
+
+func CORSMiddleware() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		c.Writer.Header().Set("Access-Control-Allow-Origin", "*")
+		c.Writer.Header().Set("Access-Control-Allow-Credentials", "true")
+		c.Writer.Header().Set("Access-Control-Allow-Headers", "Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization, accept, origin, Cache-Control, X-Requested-With")
+		c.Writer.Header().Set("Access-Control-Allow-Methods", "POST, OPTIONS, GET, PUT")
+
+		if c.Request.Method == "OPTIONS" {
+			c.AbortWithStatus(204)
+			return
+		}
+
+		c.Next()
+	}
 }
 
 func SwaggerHandler(context *gin.Context) {

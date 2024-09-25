@@ -18,7 +18,7 @@ COPY models/ /app/models
 
 COPY services/ /app/services
 
-RUN apk update && apk upgrade && apk add --no-cache build-base sqlite
+RUN apk add --no-cache build-base sqlite
 
 RUN go mod download
 

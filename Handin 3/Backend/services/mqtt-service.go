@@ -25,6 +25,10 @@ var messageHandler mqtt.MessageHandler = func(client mqtt.Client, msg mqtt.Messa
 
 	values := strings.Split(strData, ",")
 
+	if len(values) < 3 {
+		return
+	}
+
 	var measurement models.Measurement
 	var err error
 
@@ -88,16 +92,6 @@ func importConfigs() {
 
 func PublishToTopic(state int64) {
 	if token := client.Publish(TOPIC_LED, 0, false, fmt.Sprintf("%v", state)); token.Wait() && token.Error() != nil {
-		fmt.Println("Error while publishing message")
-
-		return
-	}
-
-	fmt.Println("Message successfully published!")
-}
-
-func PublishToTopicTest(value string) {
-	if token := client.Publish(TOPIC_POST, 0, false, value); token.Wait() && token.Error() != nil {
 		fmt.Println("Error while publishing message")
 
 		return

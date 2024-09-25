@@ -31,7 +31,7 @@ paths:
       summary: Get latest Co2 measurement
       tags:
       - GET API Endpoints
-  /api/v1/sensors/air-quality/voc:
+  /api/v1/sensors/air-quality/tvoc:
     get:
       consumes:
       - application/json
@@ -46,7 +46,7 @@ paths:
         "500":
           description: Internal Server Error
           schema: {}
-      summary: Get latest VOC measurement
+      summary: Get latest TVOC measurement
       tags:
       - GET API Endpoints
   /led-state/{on}:
@@ -63,8 +63,8 @@ paths:
       produces:
       - application/json
       responses:
-        "200":
-          description: OK
+        "204":
+          description: No Content
           schema:
             type: string
         "400":

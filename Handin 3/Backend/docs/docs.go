@@ -42,7 +42,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/v1/sensors/air-quality/voc": {
+        "/api/v1/sensors/air-quality/tvoc": {
             "get": {
                 "description": "Gets the latest VOC measurement from the database",
                 "consumes": [
@@ -54,7 +54,7 @@ const docTemplate = `{
                 "tags": [
                     "GET API Endpoints"
                 ],
-                "summary": "Get latest VOC measurement",
+                "summary": "Get latest TVOC measurement",
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -92,8 +92,8 @@ const docTemplate = `{
                     }
                 ],
                 "responses": {
-                    "200": {
-                        "description": "OK",
+                    "204": {
+                        "description": "No Content",
                         "schema": {
                             "type": "string"
                         }
