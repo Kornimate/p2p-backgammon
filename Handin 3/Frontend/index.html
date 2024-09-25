@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IoT</title>
+    <link href="./style.css" rel="stylesheet" />
+</head>
+<body>
+    <div class="container">
+        <div class="center">
+            <div class="queryDiv">
+                <div id="lastQueried">Not Queried</div>
+            </div>
+            <table>
+                <thead>
+                    <tr>
+                        <th colspan="2">Latest Measurements</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <th>Co2</th>
+                        <td id="co2">-</td>
+                    </tr>
+                    <tr>
+                        <th>TVOC</th>
+                        <td id="tvoc">-</td>
+                    </tr>
+                </tbody>
+            </table>
+            <div class="buttonsDiv">
+                <button id="btnLedOn">LED on</button>
+                <button id="btnLedOff">LED off</button>
+            </div>
+        </div>
+    </div>
+    <script type="text/javascript" src="./script.js"></script>
+</body>
+</html>
