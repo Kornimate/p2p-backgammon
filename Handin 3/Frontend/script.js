@@ -7,7 +7,7 @@ function Init(){
     document.getElementById("btnLedOn").addEventListener("click", LedOnClicked,false);
     document.getElementById("btnLedOff").addEventListener("click", LedOffClicked,false);
 
-    // setInterval(QueryValues, 5000)
+    setInterval(QueryValues, 5000)
 }
 
 async function LedOnClicked(){
@@ -39,10 +39,13 @@ async function QueryValues(){
         const co2_object = await FetchValue("co2");
         const tvoc_object = await FetchValue("tvoc");
 
+        console.log(co2_object)
+        console.log(tvoc_object)
+
         queryText.innerHTML = `Last Queried (${(new Date()).toLocaleString()})`
 
-        document.getElementById("co2").innerHTML = co2_object.value;
-        document.getElementById("tvoc").innerHTML = tvoc_object.value;
+        document.getElementById("co2").innerHTML = `${co2_object.value} (${co2_object.createdDate})`;
+        document.getElementById("tvoc").innerHTML = `${tvoc_object.value} (${tvoc_object.createdDate})`;
     } catch(error) {
         queryText.style.color="red";
         queryText.innerHTML = "Failed to fetch data";
@@ -54,10 +57,8 @@ async function QueryValues(){
 async function FetchValue(endpoint){
     const query = await fetch(`${BASE_URL_GET}${endpoint}`);
 
-    console.log(query)
-
     if(!query.ok)
-        throw new Error("Error while fetching tvoc")
+        throw new Error("Error while fetching data")
 
     return (await query.json());
 }

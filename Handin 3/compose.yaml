@@ -1,0 +1,30 @@
+version: '1.0'
+
+name: 'go-nginx-iot'
+
+services:
+  backend:
+    build: ./Backend/
+    container_name: "Go-Alpine"
+    restart: always
+    ports: 
+      - "8080:8080"
+    networks:
+      - net
+
+  frontend:
+    build: ./Frontend/
+    container_name: "Nginx-Alpine"
+    restart: always
+    ports: 
+      - "80:80"
+    networks:
+      - net
+    depends_on:
+      - backend
+    links:
+      - backend
+
+networks:
+  net: 
+    driver: bridge

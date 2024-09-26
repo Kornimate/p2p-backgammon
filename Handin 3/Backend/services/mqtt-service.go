@@ -2,11 +2,11 @@ package services
 
 import (
 	"crypto/tls"
+	"encoding/json"
 	"fmt"
 	"iot/main/models"
 	"os"
-	"strconv"
-	"strings"
+	"time"
 
 	mqtt "github.com/eclipse/paho.mqtt.golang"
 	"gopkg.in/yaml.v3"
@@ -21,28 +21,36 @@ var config models.Config
 var messageHandler mqtt.MessageHandler = func(client mqtt.Client, msg mqtt.Message) {
 	fmt.Printf("Received message: %s from topic: %s\n", msg.Payload(), msg.Topic())
 
-	var strData string = string(msg.Payload()[:])
-
-	values := strings.Split(strData, ",")
-
-	if len(values) < 3 {
-		return
-	}
-
-	var measurement models.Measurement
+	var dto *models.IoTDTO
 	var err error
 
-	measurement.CreatedDate = values[0]
-	measurement.MeasuremenType = values[1]
-	measurement.Value, err = strconv.ParseFloat(values[2], 64)
+	dto, err = parseJson(msg.Payload())
 
 	if err != nil {
-		fmt.Println("Could not parse incoming value")
+		return
+	}
+
+	if dto == nil {
+		fmt.Println("error while parsing incoming data")
 
 		return
 	}
 
-	InsertNewValue(measurement)
+	var tvoc models.Measurement
+	var co2 models.Measurement
+
+	var timeStamp string = time.DateTime
+
+	tvoc.CreatedDate = timeStamp
+	tvoc.MeasuremenType = "tvoc"
+	tvoc.Value = dto.Tvoc_level
+
+	co2.CreatedDate = timeStamp
+	co2.MeasuremenType = "co2"
+	co2.Value = dto.Co2_level
+
+	InsertNewValue(tvoc)
+	InsertNewValue(co2)
 }
 
 var connectionHandler mqtt.OnConnectHandler = func(client mqtt.Client) {
@@ -127,4 +135,12 @@ func EstablishMQTTConnection() {
 
 	subscribeToTopic(TOPIC_POST)
 	subscribeToTopic(TOPIC_LED)
+}
+
+func parseJson(input []byte) (*models.IoTDTO, error) {
+	var dto models.IoTDTO
+
+	err := json.Unmarshal(input, &dto)
+
+	return &dto, err
 }

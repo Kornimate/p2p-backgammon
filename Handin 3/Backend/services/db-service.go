@@ -28,7 +28,7 @@ func EstablishDatabaseConnection() (bool, error) {
 
 func createDatabaseScheme() (bool, error) {
 
-	_, err := db.Exec("CREATE TABLE IF NOT EXISTS measurements (id INTEGER PRIMARY KEY AUTOINCREMENT, created_time TEXT, measurement_type TEXT, value REAL);")
+	_, err := db.Exec("CREATE TABLE IF NOT EXISTS measurements (id INTEGER PRIMARY KEY AUTOINCREMENT, created_time TEXT, measurement_type TEXT, value INTEGER);")
 
 	if err != nil {
 		return false, err
@@ -48,7 +48,7 @@ func GetLatestTVOC() (Model.Measurement, error) {
 func getLatestValue(v_type string) (Model.Measurement, error) {
 	var measurement Model.Measurement
 
-	row := db.QueryRow("select * from measurements where created_time in (select max(created_time) from measurements where measurement_type = ?);", v_type)
+	row := db.QueryRow("select * from measurements where created_time in (select max(created_time) from measurements where measurement_type = ?) and measurement_type = ?;", v_type, v_type)
 
 	if err := row.Scan(&measurement.Id, &measurement.CreatedDate, &measurement.MeasuremenType, &measurement.Value); err != nil {
 		return measurement, fmt.Errorf("error while getting value (%v) %v", v_type, err)
