@@ -39,7 +39,7 @@ var messageHandler mqtt.MessageHandler = func(client mqtt.Client, msg mqtt.Messa
 	var tvoc models.Measurement
 	var co2 models.Measurement
 
-	var timeStamp string = time.DateTime
+	var timeStamp string = time.Now().Format(time.RFC3339)
 
 	tvoc.CreatedDate = timeStamp
 	tvoc.MeasuremenType = "tvoc"

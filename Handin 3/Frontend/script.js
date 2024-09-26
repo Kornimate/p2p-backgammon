@@ -44,8 +44,8 @@ async function QueryValues(){
 
         queryText.innerHTML = `Last Queried (${(new Date()).toLocaleString()})`
 
-        document.getElementById("co2").innerHTML = `${co2_object.value} (${co2_object.createdDate})`;
-        document.getElementById("tvoc").innerHTML = `${tvoc_object.value} (${tvoc_object.createdDate})`;
+        document.getElementById("co2").innerHTML = `${co2_object.value} (${(new Date(co2_object.createdDate)).toLocaleString()})`;
+        document.getElementById("tvoc").innerHTML = `${tvoc_object.value} (${(new Date(tvoc_object.createdDate)).toLocaleString()})`;
     } catch(error) {
         queryText.style.color="red";
         queryText.innerHTML = "Failed to fetch data";
@@ -62,3 +62,5 @@ async function FetchValue(endpoint){
 
     return (await query.json());
 }
+
+QueryValues()
