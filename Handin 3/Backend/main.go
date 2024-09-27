@@ -46,7 +46,6 @@ func main() {
 	docs.SwaggerInfo.Schemes = []string{"http", "https"}
 
 	router.GET("/swagger/*any", SwaggerHandler)
-	router.GET("/", RedirectHandler)
 
 	router.PUT("/led-state/:on", LedHandler)
 
@@ -144,8 +143,4 @@ func CORSMiddleware() gin.HandlerFunc {
 
 func SwaggerHandler(context *gin.Context) {
 	ginSwagger.WrapHandler(swaggerFiles.Handler)(context)
-}
-
-func RedirectHandler(context *gin.Context) {
-	context.Redirect(302, "/swagger/index.html")
 }

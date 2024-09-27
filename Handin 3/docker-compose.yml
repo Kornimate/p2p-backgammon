@@ -3,25 +3,25 @@ version: '1.0'
 name: 'go-nginx-iot'
 
 services:
-  backend:
-    build: ./Backend/
-    container_name: "Go-Alpine"
-    restart: always
-    ports: 
-      - "8080:8080"
-    networks:
-      - common_network
-
   frontend:
-    build: ./Frontend/
+    image: 'mkornidesz/iot-frontend:latest'
     container_name: "Nginx-Alpine"
     restart: always
     ports: 
-      - "3000:80"
+      - "80:80"
     depends_on:
       - backend
     links:
       - backend
+    networks:
+      - common_network
+
+  backend:
+    image: 'mkornidesz/iot-backend:latest'
+    container_name: "Go-Alpine"
+    restart: always
+    ports: 
+      - "8080:8080"
     networks:
       - common_network
 

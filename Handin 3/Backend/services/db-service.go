@@ -3,6 +3,7 @@ package services
 import (
 	"database/sql"
 	"fmt"
+	"time"
 
 	_ "github.com/mattn/go-sqlite3"
 
@@ -44,8 +45,11 @@ func createDatabaseScheme() (bool, error) {
 	}
 
 	if rowCount <= 0 {
-		db.Exec("INSERT INTO measurements values (1,'1900-01-01T00:00:00Z02:00','tvoc',400)")
-		db.Exec("INSERT INTO measurements values (2,'1900-01-01T00:00:00Z02:00','co2',400)")
+
+		currentTime := time.Now().Format(time.RFC3339)
+
+		db.Exec(fmt.Sprintf("INSERT INTO measurements values (1,'%v','tvoc',400)", currentTime))
+		db.Exec(fmt.Sprintf("INSERT INTO measurements values (2,'%v','co2',400)", currentTime))
 	}
 
 	return true, nil
