@@ -1,7 +1,7 @@
 window.onload = Init;
 
-const BASE_URL_GET = "http://localhost:8080/api/v1/sensors/air-quality/"
-const BASE_URL_PUT = "http://localhost:8080/led-state/"
+const BASE_URL_GET = "http://backend:8080/api/v1/sensors/air-quality/"
+const BASE_URL_PUT = "http://backend:8080/led-state/"
 
 function Init(){
     document.getElementById("btnLedOn").addEventListener("click", LedOnClicked,false);

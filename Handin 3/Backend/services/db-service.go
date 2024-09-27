@@ -34,6 +34,20 @@ func createDatabaseScheme() (bool, error) {
 		return false, err
 	}
 
+	var rowCount int = -1
+	row := db.QueryRow("SELECT COUNT(*) FROM measurements")
+
+	if err := row.Scan(&rowCount); err != nil {
+		fmt.Printf("Error while querying rows %v\n", err)
+
+		return false, fmt.Errorf("error while querying rows %v", err)
+	}
+
+	if rowCount <= 0 {
+		db.Exec("INSERT INTO measurements values (1,'1900-01-01T00:00:00Z02:00','tvoc',400)")
+		db.Exec("INSERT INTO measurements values (2,'1900-01-01T00:00:00Z02:00','co2',400)")
+	}
+
 	return true, nil
 }
 

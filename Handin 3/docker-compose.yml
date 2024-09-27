@@ -10,21 +10,21 @@ services:
     ports: 
       - "8080:8080"
     networks:
-      - net
+      - common_network
 
   frontend:
     build: ./Frontend/
     container_name: "Nginx-Alpine"
     restart: always
     ports: 
-      - "80:80"
-    networks:
-      - net
+      - "3000:80"
     depends_on:
       - backend
     links:
       - backend
+    networks:
+      - common_network
 
 networks:
-  net: 
+  common_network: 
     driver: bridge
