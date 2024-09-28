@@ -14,8 +14,8 @@ git clone git@gitlab.au.dk:au702308/building-the-iot.git
 
 It is possible tu run the code locally or view it in production
 
-The production site is deployed to Azure and it an be reached via this link:
-[link to azure deployed application](https://iotapp-hrg5d4fadhaqdwcz.northeurope-01.azurewebsites.net)
+The production site is deployed to Azure and it an be reached via this link: <br />
+[Link to Azure deployed application](https://iotapp-hrg5d4fadhaqdwcz.northeurope-01.azurewebsites.net)
 
 Running the instance locally requires Docker to be installed on your device and create a config.yaml file (The name must be config.yaml) at the following location: Handin 3/Backend
 
