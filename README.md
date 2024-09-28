@@ -4,7 +4,7 @@ We use the uiflow2.0 for the assignemnt.
 If you want to use the application you can start a local live server. 
 
 
-## Clone Reository
+## Clone Repository
 
 ```
 cd Where_to_clone
