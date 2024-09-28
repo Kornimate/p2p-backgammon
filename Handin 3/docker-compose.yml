@@ -4,7 +4,8 @@ name: 'go-nginx-iot'
 
 services:
   frontend:
-    image: 'mkornidesz/iot-frontend:latest'
+    # image: 'mkornidesz/iot-frontend:latest'
+    build: ./Frontend
     container_name: "Nginx-Alpine"
     restart: always
     ports: 
@@ -17,7 +18,8 @@ services:
       - common_network
 
   backend:
-    image: 'mkornidesz/iot-backend:latest'
+    # image: 'mkornidesz/iot-backend:latest'
+    build: ./Backend
     container_name: "Go-Alpine"
     restart: always
     ports: 

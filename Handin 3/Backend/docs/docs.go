@@ -15,6 +15,33 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
+        "/api/v1/mqtt-connection": {
+            "get": {
+                "description": "Indicates if api is connected to MQTT broker",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "GET API Endpoints"
+                ],
+                "summary": "Indicates if api is connected to MQTT broker",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.StatusDTO"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {}
+                    }
+                }
+            }
+        },
         "/api/v1/sensors/air-quality/co2": {
             "get": {
                 "description": "Gets the latest Co2 measurement from the database",
@@ -124,7 +151,15 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "value": {
-                    "type": "number"
+                    "type": "integer"
+                }
+            }
+        },
+        "models.StatusDTO": {
+            "type": "object",
+            "properties": {
+                "alive": {
+                    "type": "boolean"
                 }
             }
         }

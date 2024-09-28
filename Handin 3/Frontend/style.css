@@ -86,3 +86,19 @@ button:hover{
     padding-bottom: 0.5rem;
 }
 
+.mqttDiv{
+    display: flex;
+    width: 100%;
+    justify-content: center;
+    border-radius: 10px;
+    margin-top: 1rem;
+    background-color: azure;
+}
+
+#indicator{
+    background-color: gray;
+    padding: 0.4rem;
+    border-radius: 5px;
+    margin: 0.5rem;
+    border: 2px solid black;
+}

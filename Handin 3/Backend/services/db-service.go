@@ -66,7 +66,7 @@ func GetLatestTVOC() (Model.Measurement, error) {
 func getLatestValue(v_type string) (Model.Measurement, error) {
 	var measurement Model.Measurement
 
-	row := db.QueryRow("select * from measurements where created_time in (select max(created_time) from measurements where measurement_type = ?) and measurement_type = ?;", v_type, v_type)
+	row := db.QueryRow("select * from measurements where id in (select max(id) from measurements where measurement_type = ?);", v_type)
 
 	if err := row.Scan(&measurement.Id, &measurement.CreatedDate, &measurement.MeasuremenType, &measurement.Value); err != nil {
 		return measurement, fmt.Errorf("error while getting value (%v) %v", v_type, err)

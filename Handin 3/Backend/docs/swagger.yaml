@@ -8,11 +8,34 @@ definitions:
       measurementType:
         type: string
       value:
-        type: number
+        type: integer
+    type: object
+  models.StatusDTO:
+    properties:
+      alive:
+        type: boolean
     type: object
 info:
   contact: {}
 paths:
+  /api/v1/mqtt-connection:
+    get:
+      consumes:
+      - application/json
+      description: Indicates if api is connected to MQTT broker
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.StatusDTO'
+        "500":
+          description: Internal Server Error
+          schema: {}
+      summary: Indicates if api is connected to MQTT broker
+      tags:
+      - GET API Endpoints
   /api/v1/sensors/air-quality/co2:
     get:
       consumes:

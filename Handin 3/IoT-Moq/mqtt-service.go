@@ -3,15 +3,17 @@ package main
 import (
 	"crypto/tls"
 	"fmt"
-	"time"
+	"os"
 
 	mqtt "github.com/eclipse/paho.mqtt.golang"
+	yaml "gopkg.in/yaml.v2"
 )
 
 const TOPIC_POST string = "Alfa/api/POST"
 const TOPIC_LED string = "Alfa/api/LED"
 
 var client mqtt.Client
+var config Config
 
 var messageHandler mqtt.MessageHandler = func(client mqtt.Client, msg mqtt.Message) {
 	fmt.Printf("Received message: %s from topic: %s\n", msg.Payload(), msg.Topic())
@@ -56,15 +58,33 @@ func PublishToTopic(inputJson string) {
 	fmt.Println("Message successfully published!")
 }
 
-func EstablishMQTTConnection() {
+func importConfigs() {
+	file, err := os.Open("config.yaml")
+
+	if err != nil {
+		panic("Unable to open config file")
+	}
+
+	defer file.Close()
+
+	err = (yaml.NewDecoder(file)).Decode(&config)
+
+	if err != nil {
+		panic("Unable to parse config file")
+	}
+}
+
+func EstablishMQTTConnection() mqtt.Client {
+
+	importConfigs()
 
 	opts := mqtt.NewClientOptions()
 
-	opts.AddBroker(fmt.Sprintf("ssl://%s:%d", "myggen.mooo.com", 8883))
+	opts.AddBroker(fmt.Sprintf("ssl://%s:%d", config.Mqtt.Broker, config.Mqtt.Port))
 
-	opts.SetClientID(fmt.Sprintf("user-%v", time.Now().Format(time.RFC3339)))
-	opts.SetUsername("Alfa")
-	opts.SetPassword("dqzbhNVwMAg172j9")
+	opts.SetClientID("user-bvuwbvcuehbc")
+	opts.SetUsername(config.Mqtt.Username)
+	opts.SetPassword(config.Mqtt.Password)
 	opts.SetDefaultPublishHandler(messageHandler)
 
 	tlsConfig := newTlsConfig()
@@ -80,4 +100,6 @@ func EstablishMQTTConnection() {
 	}
 
 	subscribeToTopic(TOPIC_POST)
+
+	return client
 }

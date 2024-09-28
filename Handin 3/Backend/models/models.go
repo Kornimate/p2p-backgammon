@@ -18,5 +18,9 @@ type Config struct {
 
 type IoTDTO struct {
 	Co2_level  int `json:"co2_level"`
-	Tvoc_level int `json:"tvoc_level"`
+	Tvoc_level int `json:"TVOC_level"`
+}
+
+type StatusDTO struct {
+	Alive bool `json:"alive"`
 }

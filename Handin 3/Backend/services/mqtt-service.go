@@ -59,6 +59,8 @@ var connectionHandler mqtt.OnConnectHandler = func(client mqtt.Client) {
 
 var connectionLostHandler mqtt.ConnectionLostHandler = func(client mqtt.Client, err error) {
 	fmt.Printf("Connect lost: %v", err)
+
+	EstablishDatabaseConnection()
 }
 
 //private functions
@@ -120,6 +122,7 @@ func EstablishMQTTConnection() {
 	opts.SetUsername(config.Mqtt.Username)
 	opts.SetPassword(config.Mqtt.Password)
 	opts.SetDefaultPublishHandler(messageHandler)
+	opts.CleanSession = false
 
 	tlsConfig := newTlsConfig()
 	opts.SetTLSConfig(tlsConfig)
@@ -134,7 +137,6 @@ func EstablishMQTTConnection() {
 	}
 
 	subscribeToTopic(TOPIC_POST)
-	subscribeToTopic(TOPIC_LED)
 }
 
 func parseJson(input []byte) (*models.IoTDTO, error) {
@@ -143,4 +145,13 @@ func parseJson(input []byte) (*models.IoTDTO, error) {
 	err := json.Unmarshal(input, &dto)
 
 	return &dto, err
+}
+
+func IsClientAlive() bool {
+
+	fmt.Println(client.IsConnected())
+	fmt.Println(client.IsConnectionOpen())
+
+	return client.IsConnected() && client.IsConnectionOpen()
+
 }

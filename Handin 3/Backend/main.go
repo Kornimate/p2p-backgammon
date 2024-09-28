@@ -8,6 +8,7 @@ import (
 	"github.com/gin-gonic/gin"
 
 	docs "iot/main/docs"
+	"iot/main/models"
 	service "iot/main/services"
 
 	swaggerFiles "github.com/swaggo/files"
@@ -37,6 +38,8 @@ func main() {
 			group.GET("/co2", GetCO2)
 			group.GET("/tvoc", GetTVOC)
 		}
+
+		v1.GET("/mqtt-connection", GetMQTTConnectionState)
 
 	}
 
@@ -90,6 +93,24 @@ func GetTVOC(context *gin.Context) {
 	}
 
 	context.IndentedJSON(http.StatusOK, value)
+}
+
+// GetMQTTConnectionState
+// @Summary      Indicates if api is connected to MQTT broker
+// @Description  Indicates if api is connected to MQTT broker
+// @Tags         GET API Endpoints
+// @Accept       json
+// @Produce      json
+// @Success      200  {object}  models.StatusDTO
+// @Failure      500  {object}  error
+// @Router       /api/v1/mqtt-connection [get]
+func GetMQTTConnectionState(context *gin.Context) {
+
+	status := models.StatusDTO{
+		Alive: service.IsClientAlive(),
+	}
+
+	context.IndentedJSON(http.StatusOK, status)
 }
 
 // LedHandler
