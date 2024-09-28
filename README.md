@@ -29,7 +29,7 @@ mqtt:
   password: "<your password>"
 ```
 
-Copy this content into the config.yaml and start the application with the following command from the "Handin 3" folder:
+Copy this content into the config.yaml and fill in the correct credentials and start the application with the following command from the "Handin 3" folder:
 
 ```
 docker-compose up --build
@@ -38,7 +38,8 @@ docker-compose up --build
 If you do not have an IoT device there is a Moq instance you can run to try the application. To use it, you need to do the following:
 
 1. Go to the Handin 3/IoT-Moq folder
-2. Create the config file like it was written before but now in this folder (Handin 3/IoT-Moq):
+2. Create the config file like it was written before but now in this folder (Handin 3/IoT-Moq)
+3. Run the following commands:
 
 ```
 docker build -t "iot-moq" .
