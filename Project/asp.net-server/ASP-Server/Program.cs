@@ -1,7 +1,9 @@
 
+using ASP_Server.HostedServices;
 using ASP_Server.Hubs;
 using ASP_Server.Models;
 using ASP_Server.Services;
+using Microsoft.AspNetCore.Cors.Infrastructure;
 using Microsoft.EntityFrameworkCore;
 
 namespace ASP_Server
@@ -20,22 +22,36 @@ namespace ASP_Server
 
             builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
+            builder.Services.AddCors(options =>
+            {
+                options.AddPolicy("CORSPolicy", builder =>
+                {
+                    builder.WithOrigins(["http://localhost:3000"])
+                           .AllowAnyHeader()
+                           .AllowAnyMethod();
+                });
+            });
+
             builder.Services.AddSignalR();
 
             builder.Services.AddControllers();
-            
+
             builder.Services.AddEndpointsApiExplorer();
-            
+
             builder.Services.AddSwaggerGen();
 
             builder.Services.AddScoped<IServerService, ServerService>();
+
+            builder.Services.AddSingleton<ISharedServerService, SharedServerService>();
+
+            builder.Services.AddHostedService<MatchMakingService>();
 
             var app = builder.Build();
 
             app.UseSwagger();
             app.UseSwaggerUI();
 
-            app.UseCors();
+            app.UseCors("CORSPolicy");
 
             app.UseHttpsRedirection();
 
