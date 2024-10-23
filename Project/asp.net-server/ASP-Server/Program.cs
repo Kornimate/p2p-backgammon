@@ -1,6 +1,7 @@
 
 using ASP_Server.Hubs;
 using ASP_Server.Models;
+using ASP_Server.Services;
 using Microsoft.EntityFrameworkCore;
 
 namespace ASP_Server
@@ -27,10 +28,14 @@ namespace ASP_Server
             
             builder.Services.AddSwaggerGen();
 
+            builder.Services.AddScoped<IServerService, ServerService>();
+
             var app = builder.Build();
 
             app.UseSwagger();
             app.UseSwaggerUI();
+
+            app.UseCors();
 
             app.UseHttpsRedirection();
 
