@@ -4,7 +4,7 @@
     <TargetFramework>net8.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
-    <InvariantGlobalization>true</InvariantGlobalization>
+    <InvariantGlobalization>false</InvariantGlobalization>
     <RootNamespace>ASP_Server</RootNamespace>
     <UserSecretsId>d51ebd41-4a0c-4b7b-ae4c-6fe8e70ede8b</UserSecretsId>
     <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>

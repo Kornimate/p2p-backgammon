@@ -4,6 +4,7 @@ using ASP_Server.Hubs;
 using ASP_Server.Models;
 using ASP_Server.Services;
 using Microsoft.AspNetCore.Cors.Infrastructure;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
 namespace ASP_Server
@@ -16,9 +17,13 @@ namespace ASP_Server
 
             builder.Services.AddDbContext<ServerDbContext>(options =>
             {
-                options.UseSqlServer(builder.Configuration.GetConnectionString("SQLConnection"));
+                options.UseSqlServer(builder.Configuration.GetConnectionString("SQLDEVCONNECTION"));
                 options.UseLazyLoadingProxies();
             });
+
+            builder.Services.AddIdentity<IdentityUser, IdentityRole>()
+                            .AddEntityFrameworkStores<ServerDbContext>()
+                            .AddDefaultTokenProviders();
 
             builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
@@ -60,6 +65,11 @@ namespace ASP_Server
             app.MapControllers();
 
             app.MapHub<ServerHub>("/matchMaking");
+
+            using (var serviceScope = app.Services.CreateScope())
+            {
+                ServerStartUpService.HandleStartUp(serviceScope.ServiceProvider);
+            }
 
             app.Run();
         }
