@@ -8,10 +8,14 @@ const Connectivity = () => {
     const [id, setId] = useState('');
 
     useEffect(() => {
+
+        console.log(`token: ${localStorage.getItem("token")}`);
         
         let signalRConn = new signalR.HubConnectionBuilder()
         .withUrl("http://localhost:8080/matchMaking",{
-            withCredentials:false
+            accessTokenFactory: () =>{
+                return localStorage.getItem("token")
+            }
         })
         .build();
 
@@ -28,7 +32,7 @@ const Connectivity = () => {
                 connection.on("GetId", data => {
                     setId(data);
                     console.log(`Id assigned: ${data}`);
-                    connection.invoke("PublishUserData", `${data}${IdSeparator}${0}`)
+                    connection.invoke("PublishUserData", `${localStorage.getItem("user")}${IdSeparator}${0}`)
                 });
         
                 connection.on("RecieveMessage", data => {

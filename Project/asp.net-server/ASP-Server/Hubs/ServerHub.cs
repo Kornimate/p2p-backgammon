@@ -1,10 +1,12 @@
 ﻿using ASP_Server.Constants;
 using ASP_Server.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.SignalR;
 using System.Collections.Concurrent;
 
 namespace ASP_Server.Hubs
 {
+    [Authorize]
     public class ServerHub : Hub
     {
         private readonly ISharedServerService sharedService;

@@ -14,6 +14,8 @@ import MuiCard from '@mui/material/Card';
 import { styled } from '@mui/material/styles';
 import AppTheme from '../../shared-theme/AppTheme';
 import ColorModeSelect from '../../shared-theme/ColorModeSelect';
+import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 
 const Card = styled(MuiCard)(({ theme }) => ({
   display: 'flex',
@@ -63,16 +65,31 @@ export default function SignIn(props) {
   const [passwordError, setPasswordError] = React.useState(false);
   const [passwordErrorMessage, setPasswordErrorMessage] = React.useState('');
 
-  const handleSubmit = (event) => {
+  const navigate = useNavigate();
+
+  const handleSubmit = async (event) => {
+    
+    event.preventDefault();
+    
     if (emailError || passwordError) {
-      event.preventDefault();
       return;
     }
     const data = new FormData(event.currentTarget);
-    console.log({
+    const postData = {
       email: data.get('email'),
       password: data.get('password'),
-    });
+    };
+
+    try{
+      const response = await axios.post("http://localhost:8080/api/auth/login", postData);
+      localStorage.setItem("token",response.data.token);
+      localStorage.setItem("user",postData.email);
+      console.log(`token recieved: ${response.data.token}`)
+      navigate('/connection')
+    }
+    catch{
+      console.log("invalid credentials");
+    }
   };
 
   const validateInputs = () => {
@@ -163,10 +180,6 @@ export default function SignIn(props) {
                 color={passwordError ? 'error' : 'primary'}
               />
             </FormControl>
-            <FormControlLabel
-              control={<Checkbox value="remember" color="primary" />}
-              label="Remember me"
-            />
             <Button
               type="submit"
               fullWidth

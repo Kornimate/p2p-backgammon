@@ -3,9 +3,12 @@ using ASP_Server.HostedServices;
 using ASP_Server.Hubs;
 using ASP_Server.Models;
 using ASP_Server.Services;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Cors.Infrastructure;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
 
 namespace ASP_Server
 {
@@ -33,8 +36,28 @@ namespace ASP_Server
                 {
                     builder.WithOrigins(["http://localhost:3000"])
                            .AllowAnyHeader()
-                           .AllowAnyMethod();
+                           .AllowAnyMethod()
+                           .AllowCredentials();
                 });
+            });
+
+            builder.Services.AddAuthentication(options =>
+            {
+                options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+            })
+            .AddJwtBearer(options =>
+            {
+                options.TokenValidationParameters = new TokenValidationParameters
+                {
+                    ValidateIssuer = true,
+                    ValidateAudience = true,
+                    ValidateLifetime = true,
+                    ValidateIssuerSigningKey = true,
+                    ValidIssuer = builder.Configuration["Jwt:Issuer"],
+                    ValidAudience = builder.Configuration["Jwt:Audience"],
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]!))
+                };
             });
 
             builder.Services.AddSignalR();
@@ -48,6 +71,8 @@ namespace ASP_Server
             builder.Services.AddScoped<IServerService, ServerService>();
 
             builder.Services.AddSingleton<ISharedServerService, SharedServerService>();
+
+            builder.Services.AddSingleton<JWTService>();
 
             builder.Services.AddHostedService<MatchMakingService>();
 
