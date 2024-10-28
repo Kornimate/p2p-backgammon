@@ -15,7 +15,7 @@ git clone git@gitlab.au.dk:au702308/building-the-iot.git
 It is possible to run the code locally or view it in production
 
 The production site is deployed to Azure and it an be reached via this link: <br />
-[Link to Azure deployed application](https://iotapp-hrg5d4fadhaqdwcz.northeurope-01.azurewebsites.net) **- from 2024.10.28. not available due to free sucbscription end in Azure**<br />
+[Link to Azure deployed application](https://iotapp-hrg5d4fadhaqdwcz.northeurope-01.azurewebsites.net) **- from 2024.10.28. not available due to free subscription end in Azure**<br />
 The problem with Azure is that if the application is inactive, Azure disables the resources behind it in F1 tier (free tier, always on mode costs 13$ per month :( ). **We have** a solution for this but if you experience that the applicaiton is not working please can contact me on email: kornimate@gmail.com, or write me on messenger: Kornidesz Máté.
 
 Running the instance locally requires Docker to be installed on your device and create a config.yaml file (The name must be config.yaml) at the following location: Handin 3/Backend
