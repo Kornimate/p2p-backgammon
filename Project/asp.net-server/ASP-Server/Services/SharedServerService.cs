@@ -6,10 +6,12 @@ namespace ASP_Server.Services
     public class SharedServerService : ISharedServerService
     {
         private readonly ConcurrentDictionary<string, string> usersInGroups;
+        private readonly Dictionary<string, string> aloneUsers;
 
         public SharedServerService()
         {
             usersInGroups = new();
+            aloneUsers = new();
         }
 
         public async Task<bool> AddToCollectionAsync(string id, int gameNum)
@@ -27,6 +29,13 @@ namespace ASP_Server.Services
 
             WriteCollectionToConsole($"user removed from collection: {id} {{{res}}}");
 
+            lock (aloneUsers)
+            {
+                res = aloneUsers.Remove(id); 
+            }
+
+            WriteCollectionToConsole($"user removed from alones: {id} {{{res}}}");
+
             return await Task.FromResult(res);
         }
 
@@ -36,19 +45,68 @@ namespace ASP_Server.Services
 
             var userDatas = usersInGroups.Where(x => x.Value == group).Take(2).ToArray();
 
+            if (userDatas.Length < 1)
+            {
+                return (false, [userDatas[0].Key, userDatas[0].Value]);
+            }
+
             if (userDatas.Length < 2)
-                return (false, null);
+                return (false, [userDatas[0].Key]);
 
             bool success = true;
 
             for (int i = 0; i < userDatas.Length; i++)
             {
-                success &= usersInGroups.TryGetValue(userDatas[i].Key, out var userData);
+                success &= usersInGroups.TryRemove(userDatas[i].Key, out var userData);
 
                 users[i] = userDatas[i].Key;
             }
 
             return await Task.FromResult((success, users));
+        }
+
+        public Task AddUserToRemainder(string[] userData)
+        {
+            lock (aloneUsers)
+            {
+                aloneUsers.Add(userData[0], userData[1]);
+            }
+
+            return Task.CompletedTask;
+        }
+
+        public Task<List<(string, string)>> MakePairsFromRemainder()
+        {
+            var pairBase = new List<KeyValuePair<string, string>>();
+
+            lock (aloneUsers)
+            {
+                if (aloneUsers.Count < 2)
+                    return Task.FromResult<List<(string, string)>>([]);
+
+                if (aloneUsers.Count % 2 == 0)
+                {
+                    pairBase = [.. aloneUsers.OrderBy(x => x.Value)];
+                    pairBase.Clear();
+                }
+                else
+                {
+                    pairBase = [.. aloneUsers.OrderBy(x => x.Value)];
+                    var last = pairBase[^1];
+                    pairBase.Clear();
+                    pairBase.Add(last);
+
+                }
+            }
+
+            List<(string, string)> pairs = [];
+
+            for (int i = 0; i < pairBase.Count; i += 2)
+            {
+                pairs.Add((pairBase[i].Key, pairBase[i + 1].Key));
+            }
+
+            return Task.FromResult(pairs);
         }
 
         private void WriteCollectionToConsole(string startText)
