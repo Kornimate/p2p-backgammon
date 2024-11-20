@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Backgammon Board</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #2a2a2a;
+        }
+        .board-container {
+            position: relative;
+            width: 1000px;
+            height: 500px;
+        }
+        canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="board-container">
+        <canvas id="boardCanvas" width="1000" height="500"></canvas>
+        <canvas id="piecesCanvas" width="1000" height="500"></canvas>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>
