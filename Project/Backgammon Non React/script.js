@@ -145,6 +145,7 @@ function handlePieceMovement(clickX, clickY) {
             if (isPointInTriangle(clickX, clickY, triangles[i])) {
                 const newPositionIndex = triangles[i].positionIndex;
                 if (board[newPositionIndex]) {
+                    console.log(isMoveLegal(selectedPiecePosition, newPositionIndex))
                     if (selectedPiece.color === 'white') {
                         board[selectedPiecePosition][0]--;
                         board[newPositionIndex][0]++;
@@ -196,7 +197,6 @@ function isMoveLegal(start, end) {
             return false;
         }
     }
-
 }
 
 

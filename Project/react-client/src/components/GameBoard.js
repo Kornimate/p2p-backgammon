@@ -175,9 +175,11 @@ const GameBoard = () => {
 
     function isMoveLegal(start, end) {
         const playerInTurn = 'white';
+        const dieRoll = [5,2]
         const player = playerInTurn === 'white' ? 0 : 1;
         const opponentPiecesAtEnd = board[end][1 - player];
         const piece = board[start][player];
+        
 
         if (opponentPiecesAtEnd > 1) {
             return false;
@@ -192,6 +194,9 @@ const GameBoard = () => {
             if (start < end) {
                 return false;
             }
+        }
+        if (Math.abs(start - end) !== dieRoll[0] || Math.abs(start - end) !== dieRoll[1]) {
+            return false;
         }
 
     }
@@ -274,3 +279,4 @@ const GameBoard = () => {
     )
 }
 export default GameBoard;
+
