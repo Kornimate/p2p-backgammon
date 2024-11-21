@@ -11,6 +11,9 @@ const GameBoard = () => {
         [0, 5], [0, 0], [0, 0], [0, 0], [3, 0], [0, 0],   // (13 - 18)
         [5, 0], [0, 0], [0, 0], [0, 0], [0, 0], [0, 2]    // (19 - 24)
     ]);
+    const [nockedHome, setNockedHome] = useState([0],[0])
+
+    
 
     const boardCanvas = useRef();
     const piecesCanvas = useRef();
@@ -170,13 +173,11 @@ const GameBoard = () => {
     }
 
 
-
     function isMoveLegal(start, end) {
         const playerInTurn = 'white';
         const player = playerInTurn === 'white' ? 0 : 1;
         const opponentPiecesAtEnd = board[end][1 - player];
         const piece = board[start][player];
-
 
         if (opponentPiecesAtEnd > 1) {
             return false;
