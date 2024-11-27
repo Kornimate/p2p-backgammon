@@ -1,18 +1,12 @@
-body {
-    display: flex;
+.boardImg {
+    width: 792px;
+    height: 400px;
+}
+
+.container{
+    display: block;
     justify-content: center;
-    align-items: center;
-    height: 100vh;
-    margin: 0;
-    background-color: #2a2a2a;
-}
-.board-container {
-    position: relative;
-    width: 1000px;
-    height: 500px;
-}
-canvas {
-    position: absolute;
-    top: 0;
-    left: 0;
+    min-height: 100vh;
+    align-content: center;
+    overflow-x: scroll;
 }
