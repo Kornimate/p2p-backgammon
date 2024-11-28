@@ -10,3 +10,15 @@
     align-content: center;
     overflow-x: scroll;
 }
+
+.relativeDiv{
+    position:relative;
+    width: 792px;
+    height: 400px;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+.w800 {
+    width: 800px;
+}
