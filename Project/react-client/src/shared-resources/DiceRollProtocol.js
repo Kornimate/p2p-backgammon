@@ -87,5 +87,5 @@ export const verifyAndRollDice = () => {
         throw new Error('Potential cheating detected');
     }
     diceResult = ((randomNum + opponentRandomNum) % 6) + 1;
-    return {isValid: true, diceResult};
+    return {diceResult};
 }
