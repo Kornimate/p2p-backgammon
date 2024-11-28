@@ -1,23 +1,24 @@
 import blackImage from '../assets/black_player.png';
 import whiteImage from '../assets/white_player.png';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
-const GameBoardPieceHolder = ({x, y, size, white, black}) => {
+const GameBoardPieceHolder = ({x, size, piecesNum, isBlack, onTop}) => {
 
-    const style = {
-        position: 'absolute',
-        top: 0,
-        left: 0,
-        width: size
-      };
-
-    console.log(style)
-
-    const [blacks, setBlacks] = useState([...Array(black).map(i => i)])
-    const [whites, setWhites] = useState([...Array(white).map(i => i)])
+    const [pieces, setPieces] = useState([...Array(piecesNum).keys()].map(i => i))
 
     return (
-        <img src={blackImage} style={style} />
+        <>
+        {
+            pieces.map((element) => (
+                piecesNum > 0 && onTop && <img alt="" src={isBlack ? blackImage : whiteImage} style={{position: 'absolute', left: x, top: `${element*(size/3)+5}px`, width: size}} />
+            ))
+        }
+        {
+            pieces.map((element) => (
+               piecesNum > 0 && !onTop && <img alt="" src={isBlack ? blackImage : whiteImage} style={{position: 'absolute', left: x, bottom: `${element*(size/3)+5}px`, width: size}} />
+            ))
+        }
+        </>
     )
 }
 
