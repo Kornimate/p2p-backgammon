@@ -4,18 +4,22 @@ import { useEffect, useState } from 'react';
 
 const GameBoardPieceHolder = ({x, size, piecesNum, isBlack, onTop}) => {
 
-    const [pieces, setPieces] = useState([...Array(piecesNum).keys()].map(i => i))
+    const [pieces, setPieces] = useState([]);
+
+    useEffect(() => {
+        setPieces([...Array(piecesNum).keys()])
+    }, [piecesNum])
 
     return (
         <>
         {
             pieces.map((element) => (
-                piecesNum > 0 && onTop && <img alt="" src={isBlack ? blackImage : whiteImage} style={{position: 'absolute', left: x, top: `${element*(size/3)+5}px`, width: size}} />
+                piecesNum > 0 && onTop && <img alt="" src={isBlack ? blackImage : whiteImage} style={{position: 'absolute', left: x, top: `${element*(size/3)+5}px`, width: size}} key={`${x}_${element}`} />
             ))
         }
         {
             pieces.map((element) => (
-               piecesNum > 0 && !onTop && <img alt="" src={isBlack ? blackImage : whiteImage} style={{position: 'absolute', left: x, bottom: `${element*(size/3)+5}px`, width: size}} />
+               piecesNum > 0 && !onTop && <img alt="" src={isBlack ? blackImage : whiteImage} style={{position: 'absolute', left: x, bottom: `${element*(size/3)+5}px`, width: size}} key={`${x}_${element}`} />
             ))
         }
         </>
