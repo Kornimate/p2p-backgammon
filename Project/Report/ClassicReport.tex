@@ -57,7 +57,9 @@
 \cleardoublepage\pagenumbering{arabic}
 \cleardoublepage
 
-
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%               Edit From Here                  %%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \chapter{Introduction}
 \label{cha:introduction}
@@ -66,8 +68,66 @@
 \chapter{Architecture \& Implementation}
 \label{cha:arch--impl}
 
+\section{General Architecture}
+
+\begin{itemize}
+  \item \textbf{Server:} The servers sole purpose is connecting two players that are in the same player group to each other and then disconnecting them from the server. 
+  \item \textbf{Connecting players:} The server bootstraps the connection between the two players using PeerJS. PeerJS uses WebRTC to establish a peer-to-peer connection, and is not modified in any way by us.
+  \item \textbf{Game:} The game is implemented in JavaScript and uses the React library for the user interface. The rules of the game are standard backgammon rules and has not been modified in any way. There is however some additional security measures that are implemented to ensure that the players can not cheat. Furthermore, that are rules we are aware of that are not implemented. More on this later.
+\end{itemize}
+
+
+
+\section{Game Logic}
+Given that we are implementing standard backgammon, the game logic is relatively simple, there is however some basic rules and layout that is important to know and understand. Firstly the game is played on a board with 24 points, 12 on each side, the goal of the game is to move all of your pieces to the home board and then bear them off. The movement of a player piece is determined the roll of two dies, where a player can move one piece the sum of the two dies or two pieces the value of each die, assuming the move is legal. A player can not move the piece if there is strictly more than one of the opponents pieces on the destination. If there is exactly one of the opponents pieces on the destination, the piece is hit and moved to the bar. The player must then move the piece from the bar to the opponents home board before moving any other pieces. When a player has moved all of their pieces to the home board, they can begin moving them off the board. The winner of the game is the player that first moves all of their pieces off the board.
+
+As illustrated in figure \ref{fig:backgammon_board_setup}, and briefly described above, the board is divided into four quadrants, where whites home board is the top right quadrant (numbers 19-24) and backs home board is the bottom right quadrant (numbers 1-6). This subsequently means that white and black move in opposite directions. White moves in a clockwise direction increasing in number, while black moves in a counter-clockwise direction decreasing in number. This is important to keep in mind when implementing the movement of the pieces and checking for legal moves.
+
+
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1\textwidth]{gfx/Backgammon-setup.jpg}
+    \caption{Backgammon board setup}
+    \label{fig:backgammon_board_setup}
+\end{figure}
+
+\section{Networking}
+
+
+\section{User Interface}
+
+\section{Implementation}
+Our project uses multiple programming languages and technologies to implement that game and server connection to connect the players. The server part is written primary in C\# and uses ASP.NET as the framework for setting up the server. The game itself is written in JavaScript and primarily uses the React library for the user interface.
+
+\subsection{Security}
+
+The major security concern in this project is ensuring that it is with high probability not possible for one of the players to cheat by convincing the opponent that the die he threw was different from what it actually was. In many instances like this there is a third party server that ensures that the parties playing the game is not cheating, but in our case where the game is distributed using a peer-to-peer network, we can not use a third party server as then it would not really be a peer-to-peer network. To solve this problem we have designed a cryptographic protocol that with high probability ensures that the players can not cheat. The protocol is as follows: 
+
+For simplicity, we note that the die has 6 sides and that the players are called A and B
+\begin{enumerate}
+  \item A picks a random number $r_A \in \{1,2,3,4,5,6\}$ and a nonce $n_A \in \{0,1,\dots 2^{128}-1\}$
+  \item A uses a cryptographic hash function $H$ to calculate $h_A = H(r_A || n_A)$ where $||$ denotes concatenation
+  \item B picks a random number $r_B \in \{1,2,3,4,5,6\}$ and a nonce $n_B \in \{0,1,\dots 2^{128}-1\}$
+  \item B uses a cryptographic hash function $H$ to calculate $h_B = H(r_B || n_B)$ where $||$ denotes concatenation 
+  \item A sends $h_A$ to B
+  \item B sends $h_B$ to A
+  \item Once A has received $h_B$ and B has received $h_A$ they send $r_A, \; n_A$ and $r_B, \; n_B$ respectively to the other player.
+  \item The players check if $H(r_A || n_A) = h_A$ and $H(r_B || n_B) = h_B$ if this is the case a fair die has been thrown and the protocol continues. If not cheating is suspected and the game is terminated.
+  \item Both players compute the value of the die as $(r_A + r_B \mod 6) + 1$
+\end{enumerate}
+The protocol is designed to mimic a fair die, each player contributes with a random number for the die, as the number is random the opponent has no way of knowing what number is picked and thus has no way of influencing the outcome of the die. The nonce is used such that the opponent can not reuse or brute force the hash function to find the number that the opponent picked.
+
+There is a small caveat to the protocol, if a player is able to brute force the hash function, he can cheat. This is however not really a problem as we are using a cryptographic hash function, which there is no efficient way of brute forcing, furthermore the protocol uses a nonce of 128 bits and a one bit number, which means that there is $2^{129}$ possible combinations for each die throw, which is infeasible to brute force. If further security is needed the nonce can simply be increased to a larger number, or slow hashing can be used.
+
+\section{Backlog}
+
+
+
 \chapter{Evaluation \& Conclusion}
 \label{cha:evaluation}
+
+
 
 
 
@@ -77,7 +137,15 @@
 \chapter{An appendix}
 \label{cha:an-appendix}
 
+\section{Gitlab Repository}
+The code for the project can be found at the following gitlab repository. Note that at the time of writing the repository is private and thus requires access to view. It is however expected that the repository will be made public at some point in the future.\\
+\gitlab{https://gitlab.au.dk/au702308/building-the-iot}
 
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%              Stop editing here                %%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %********************************************************************
 % Other Stuff in the Back

@@ -346,3 +346,13 @@
 %%% mode: latex
 %%% TeX-master: "./ClassicThesis"
 %%% End:
+
+
+\usepackage{float}
+
+\newcommand{\gitlab}[1]{%
+    \href{#1}{%
+        \includegraphics[height=1.8ex]{gfx/Gitlab-Logo.png}% 
+        \text{ } \url{#1}\\%
+    }%
+}
