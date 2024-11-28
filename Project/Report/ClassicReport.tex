@@ -57,7 +57,9 @@
 \cleardoublepage\pagenumbering{arabic}
 \cleardoublepage
 
-
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%               Edit From Here                  %%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \chapter{Introduction}
 \label{cha:introduction}
@@ -66,10 +68,60 @@
 \chapter{Architecture \& Implementation}
 \label{cha:arch--impl}
 
+\section{General Architecture}
+
+
+\section{Game Logic}
+Given that we are implementing standard backgammon, the game logic is relatively simple, there is however some basic rules and layout that is important to know and understand. Firstly the game is played on a board with 24 points, 12 on each side, the goal of the game is to move all of your pieces to the home board and then bear them off. The movement of a player piece is determined the roll of two dies, where a player can move one piece the sum of the two dies or two pieces the value of each die, assuming the move is legal. A player can not move the piece if there is strictly more than one of the opponents pieces on the destination. If there is exactly one of the opponents pieces on the destination, the piece is hit and moved to the bar. The player must then move the piece from the bar to the opponents home board before moving any other pieces. When a player has moved all of their pieces to the home board, they can begin moving them off the board. The winner of the game is the player that first moves all of their pieces off the board.
+
+As illustrated in figure \ref{fig:backgammon_board_setup}, and briefly described above, the board is divided into four quadrants, where whites home board is the top right quadrant (numbers 19-24) and backs home board is the bottom right quadrant (numbers 1-6). This subsequently means that white and black move in opposite directions. White moves in a clockwise direction increasing in number, while black moves in a counter-clockwise direction decreasing in number. This is important to keep in mind when implementing the movement of the pieces and checking for legal moves.
+
+
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1\textwidth]{gfx/Backgammon-setup.jpg}
+    \caption{Backgammon board setup}
+    \label{fig:backgammon_board_setup}
+\end{figure}
+
+\section{Networking}
+
+\section{User Interface}
+
+\section{Implementation}
+
+\subsection{Security}
+
+The major security concern in this project is ensuring that it is with high probability not possible for one of the players to cheat by convincing the opponent that the die he threw was different from what it actually was. In many instances like this there is a third party server that ensures that the parties playing the game is not cheating, but in our case where the game is distributed using a peer-to-peer network, we can not use a third party server as then it would not really be a peer-to-peer network. To solve this problem we have designed a cryptographic protocol that with high probability ensures that the players can not cheat. The protocol is as follows: 
+
+For simplicity, we note that the die has 6 sides and that the players are called A and B
+\begin{enumerate}
+  \item A picks a random number $r_A \in \{1,2,3,4,5,6\}$ and a nonce $n_A \in \{0,1,\dots 2^{128}-1\}$
+  \item A uses a cryptographic hash function $H$ to calculate $h_A = H(r_A || n_A)$ where $||$ denotes concatenation
+  \item B picks a random number $r_B \in \{1,2,3,4,5,6\}$ and a nonce $n_B \in \{0,1,\dots 2^{128}-1\}$
+  \item B uses a cryptographic hash function $H$ to calculate $h_B = H(r_B || n_B)$ where $||$ denotes concatenation 
+  \item A sends $h_A$ to B
+  \item B sends $h_B$ to A
+  \item Once A has received $h_B$ and B has received $h_A$ they send $r_A, \; n_A$ and $r_B, \; n_B$ respectively to the other player.
+  \item The players check if $H(r_A || n_A) = h_A$ and $H(r_B || n_B) = h_B$ if this is the case a fair die has been thrown and the protocol continues. If not cheating is suspected and the game is terminated.
+  \item 
+\end{enumerate}
+
+
+\section{Further Work \& Backlog}
+
+
+
 \chapter{Evaluation \& Conclusion}
 \label{cha:evaluation}
 
 
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%              Stop editing here                %%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \appendix
 \cleardoublepage
