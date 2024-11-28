@@ -1,4 +1,4 @@
-import GameBoardNew from "../components/GameBoardNew"
+import GameBoardNew from "../components/GameBoard"
 
 const GamePage = () => {
     return (

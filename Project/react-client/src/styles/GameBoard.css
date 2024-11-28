@@ -9,6 +9,8 @@
     min-height: 100vh;
     align-content: center;
     overflow-x: scroll;
+    border: 1px solid black;
+    border-radius: 3px;
 }
 
 .relativeDiv{
@@ -19,6 +21,40 @@
     transform: translateX(-50%);
 }
 
-.w800 {
-    width: 800px;
+.knockedOutDiv img{
+    width: 66px;
+    border: 5px solid black;
+    border-radius: 10px;
+    padding: 3px;
+}
+
+.knockedOutDiv img:hover{
+    background: gray;
+    transition: background 0.5s;
+}
+
+.knockedOutDiv {
+    position: relative;
+}
+
+.knockedOutDiv > div {
+    position: absolute;
+    top: 46%; 
+    left: 43%; 
+    transform: translate(-50%, -50%);
+}
+
+
+.knockedOutPiecesDivHolder{
+    display: flex;
+    justify-content: center;
+}
+
+.knockedOutPiecesDivHolder div {
+    margin-left:5px;
+    margin-right:5px;
+}
+
+.buttonsDiv{
+    min-width: 800px;
 }
