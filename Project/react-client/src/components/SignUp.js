@@ -189,7 +189,7 @@ export default function SignUp(props) {
               Already have an account?{' '}
               <span>
                 <Link
-                  href="/material-ui/getting-started/templates/sign-in/"
+                  href="/auth/login"
                   variant="body2"
                   sx={{ alignSelf: 'center' }}
                 >

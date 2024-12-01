@@ -1,0 +1,10 @@
+.container{
+    display: block;
+    justify-content: center;
+    min-height: 100vh;
+    align-content: center;
+}
+
+img{
+    width: 300px;
+}
