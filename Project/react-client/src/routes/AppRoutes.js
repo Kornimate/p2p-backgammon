@@ -8,6 +8,7 @@ import LobbyPage from "../pages/LobbyPage";
 import GamePage from "../pages/GamePage";
 import HomePage from "../pages/HomePage";
 import NotFound from "../pages/NotFound";
+import StatsPage from "../pages/StatsPage";
 
 const AppRoutes = () => {
     return (
@@ -21,6 +22,7 @@ const AppRoutes = () => {
                     <Route index element={<GameHomePage />} />
                     <Route path="lobby" element={<LobbyPage />} />
                     <Route path="match" element={<GamePage />} />
+                    <Route path="stats" element={<StatsPage />} />
                 </Route>
                 <Route path="/" element={<HomePage />} />
                 <Route path="*" element={<NotFound />} />

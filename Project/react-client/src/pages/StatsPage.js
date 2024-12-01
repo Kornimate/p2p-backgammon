@@ -1,14 +1,12 @@
-import { useState } from "react";
-import "../styles/GameHomePage.css";
-import { GetPlayerName } from "../shared-resources/StorageHandler";
-import { Stack, Button, Box } from "@mui/material";
-import logo from "../assets/logo.png"
-import {Link} from 'react-router-dom';
 import AppTheme from '../shared-theme/AppTheme';
 import { styled } from '@mui/material/styles';
 import MuiCard from '@mui/material/Card';
 import ColorModeSelect from '../shared-theme/ColorModeSelect';
 import CssBaseline from '@mui/material/CssBaseline';
+import { Button, Stack } from "@mui/material";
+import { Link } from "react-router-dom";
+import { GetPlayerGames, GetPlayerName, GetPlayerWins } from '../shared-resources/StorageHandler';
+import { useState } from 'react';
 
 const Card = styled(MuiCard)(({ theme }) => ({
     display: 'flex',
@@ -52,9 +50,14 @@ const Card = styled(MuiCard)(({ theme }) => ({
     },
   }));
 
-const GameHomePage = (props) => {
 
-    const [playerName] = useState(GetPlayerName())
+const StatsPage = (props) => {
+
+    const [player] = useState(GetPlayerName());
+    const [stats] = useState({
+        games: GetPlayerGames(),
+        wins: GetPlayerWins()
+    })
 
     return (
         <AppTheme {...props}>
@@ -62,20 +65,16 @@ const GameHomePage = (props) => {
             <Container direction="column" justifyContent="space-between">
                 <ColorModeSelect sx={{ position: 'fixed', top: '1rem', right: '1rem' }} />
                 <Card variant="outlined">
-                <Box sx={{display: 'flex', justifyContent: "center"}}>
-                        <img src={logo} alt="logo" />
-                    </Box>
-                    <h2>Hello {playerName}</h2>
-                        <Link to="/game/match" style={{width: "100%"}}>
-                            <Button variant="outlined" style={{width: "100%"}}>Play Game</Button>
-                        </Link>
-                        <Link to="/game/stats" style={{width: "100%"}}>
-                            <Button variant="outlined" sx={{width: "100%"}}>Statistics</Button>
-                        </Link>
+                    <h2>Statistics for {player}</h2>
+                    <div>Games: {stats.games}</div>
+                    <div>Wins: {stats.wins}</div>
+                    <Link to="/game">
+                        <Button variant="outlined" sx={{width:"100%"}}>Home</Button>
+                    </Link>
                 </Card>
             </Container>
         </AppTheme>
     )
 }
 
-export default GameHomePage;
+export default StatsPage;
