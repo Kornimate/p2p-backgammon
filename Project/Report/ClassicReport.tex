@@ -69,12 +69,24 @@
 \label{cha:arch--impl}
 
 \section{General Architecture}
+The project consists of three main components:
 
 \begin{itemize}
-  \item \textbf{Server:} The servers sole purpose is connecting two players that are in the same player group to each other and then disconnecting them from the server. 
-  \item \textbf{Connecting players:} The server bootstraps the connection between the two players using PeerJS. PeerJS uses WebRTC to establish a peer-to-peer connection, and is not modified in any way by us.
-  \item \textbf{Game:} The game is implemented in JavaScript and uses the React library for the user interface. The rules of the game are standard backgammon rules and has not been modified in any way. There is however some additional security measures that are implemented to ensure that the players can not cheat. Furthermore, that are rules we are aware of that are not implemented. More on this later.
+  \item \textbf{Client:} A React application that serves as the user interface and handles the game logic for the backgammon game. It uses Material-UI for theming and styling. The client allows users to register, log in, and play games. Key components include:
+
+  \begin{itemize}
+    \item \textbf{Home Page} (`HomePage.js`): The landing page where users can choose to log in or register.
+    \item \textbf{Authentication Pages} (`SignIn.js`, `SignUp.js`): Forms that handle user authentication.
+    \item \textbf{Game Board} (`GameBoard.js`): Displays the backgammon board and manages game interactions.
+  \end{itemize}
+  
+  \item \textbf{Server:} An ASP.NET application written in C\#. The server's primary role is to match players and facilitate the initial connection between them. Once two players are connected, the server disconnects, and the players establish a peer-to-peer connection.
+  
+  \item \textbf{Peer-to-Peer Connection:} After matchmaking, players communicate directly using PeerJS and WebRTC. This peer-to-peer connection handles real-time game data exchange without further server involvement.
+
 \end{itemize}
+
+This architecture minimizes server load by offloading game interactions to peer-to-peer connections, ensuring a responsive gaming experience. Security measures, such as cryptographic protocols, are implemented to prevent cheating and ensure fair play.
 
 
 
@@ -94,15 +106,22 @@ As illustrated in figure \ref{fig:backgammon_board_setup}, and briefly described
 \end{figure}
 
 \section{Networking}
-
+There are two types of networking used in this project, the first is the server that the players has to connect to in order to get matched with another player, the second is the peer-to-peer connection that is established between the two players once they are matched. As briefly mentioned in the general architecture section, the server is active at all times and is used to connect the players to each other, once two players are connected to each other the server disconnects from the server and from that point on the players are connected only to each other. Given that we want to use the server as little as possible, the statistics of the players are stored in the browser, as we will cover in section \ref{sec:security} this poses a minor security risk. There is also the possibility of a player clearing their browser cache and thus losing their statistics, this problem could be solved in many ways, one way could be to store the statistics in a central database, or as we would prefer, using a peer-to-peer database, it would even be possible to use a blockchain to store the statistics, it might be a bit overkill, but it is a possibility. As mentioned earlier we simply store the statistics in the browser, and thus none of the mentioned solutions are implemented, we are however aware of the problem and have thought about possible solutions.
 
 \section{User Interface}
+The user interface is primarily implemented using React. The first thing a player will see is the games home page where they can register or login. Once a player has registered their information is stored in a database, and they can log in. Once a player is logged in they are put in a lobby where they can either get matched with another player or go to a statistics page. Note that even though the statistics page is mentioned, and the pages does exist the functionality is not implemented.
+
+When they are matched by the server with another player in their player group the game begins. Once the players are matched they are connected to each other using PeerJS and the game begins. The game is played on a board that is displayed to both players, the board is a standard backgammon board with 24 points, 12 on each side.
+
+The whole user interface is designed to be intuitive and user-friendly. Everything the user will see is relatively simple in the design, partly because the game itself is rather simple, but also because we wanted to keep the design simple and clean. 
+
+The game board itself is implemented using the GameBoard component which uses various components to display the pieces and handle user interactions. The styling for the user interface is managed using CSS and images, the images are used to display the pieces and the board itself. 
 
 \section{Implementation}
 Our project uses multiple programming languages and technologies to implement that game and server connection to connect the players. The server part is written primary in C\# and uses ASP.NET as the framework for setting up the server. The game itself is written in JavaScript and primarily uses the React library for the user interface.
 
 \subsection{Security}
-
+\label{sec:security}
 The major security concern in this project is ensuring that it is with high probability not possible for one of the players to cheat by convincing the opponent that the die he threw was different from what it actually was. In many instances like this there is a third party server that ensures that the parties playing the game is not cheating, but in our case where the game is distributed using a peer-to-peer network, we can not use a third party server as then it would not really be a peer-to-peer network. To solve this problem we have designed a cryptographic protocol that with high probability ensures that the players can not cheat. The protocol is as follows: 
 
 For simplicity, we note that the die has 6 sides and that the players are called A and B
@@ -121,8 +140,18 @@ The protocol is designed to mimic a fair die, each player contributes with a ran
 
 There is a small caveat to the protocol, if a player is able to brute force the hash function, he can cheat. This is however not really a problem as we are using a cryptographic hash function, which there is no efficient way of brute forcing, furthermore the protocol uses a nonce of 128 bits and a one bit number, which means that there is $2^{129}$ possible combinations for each die throw, which is infeasible to brute force. If further security is needed the nonce can simply be increased to a larger number, or slow hashing can be used.
 
-\section{Backlog}
+A second security problem that is worth the at least have thought about is the possibility of a player to manipulate the number of games won. It is a problem that we have not taken security measures against, the main reason is that if a player is able to manipulate the number of games won, the player is really only cheating themselves. Given that players are matched based on the number of games won, the player will be matched with players that are better than them, and thus the cheating player will properly just lose the game. Furthermore, there is currently no way to profit monetarily from this game. Now that we have covered that there is no incentive to falsely increase the number of games won, a player might be lower the number of games won to get matched with players that are worse than them, this is not a new problem as a player can simply make a new account and get matched with players on the same level as the new account. This is a problem that is inherent to all games that are based on the number of games won, and is not something that we have taken measures against.
 
+
+\section{Backlog}
+The following is a list of features that we would have liked to implement, but did not have time to implement. Some of the features are not essential to the game, but would have been nice to have. The features are listed in no particular order.
+\begin{itemize}
+  \item \textbf{Statistics:} A page where the player can see their statistics, such as number of games won, number of games lost, win rate etc.
+  \item \textbf{Distributed Database:} As mentioned in the networking section, the statistics are stored in the browser, this poses a security risk, and it would have been nice to have a distributed database to store the statistics.
+  \item \textbf{Double Dice:} When a player throws a double, the player can move four times the value of the die, this is not implemented in the game.
+  \item \textbf{Crawford rule:} The Crawford rule states that if a player is one point away from winning the game, the opponent can not double the game. 
+  \item \textbf{Handicap:} If a player has a higher win rate than the opponent, the opponent can remove a number of pieces from the board before the game begins.
+\end{itemize}
 
 
 \chapter{Evaluation \& Conclusion}
@@ -141,6 +170,10 @@ There is a small caveat to the protocol, if a player is able to brute force the 
 \section{Gitlab Repository}
 The code for the project can be found at the following gitlab repository. Note that at the time of writing the repository is private and thus requires access to view. It is however expected that the repository will be made public at some point in the future.\\
 \gitlab{https://gitlab.au.dk/au702308/building-the-iot}
+
+\section{Youtube demonstration video}
+A demonstration video of the project can be found at the following youtube link.\\
+\youtube{Link to youtube video}
 
 
 
