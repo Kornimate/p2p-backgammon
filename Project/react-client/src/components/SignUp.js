@@ -12,6 +12,10 @@ import MuiCard from '@mui/material/Card';
 import { styled } from '@mui/material/styles';
 import AppTheme from '../shared-theme/AppTheme';
 import ColorModeSelect from '../shared-theme/ColorModeSelect';
+import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
+import { SetPlayerName, SetToken } from '../shared-resources/StorageHandler';
+import { useAuth } from '../hooks/AuthProvider';
 
 const Card = styled(MuiCard)(({ theme }) => ({
   display: 'flex',
@@ -63,6 +67,10 @@ export default function SignUp(props) {
   const [nameError, setNameError] = React.useState(false);
   const [nameErrorMessage, setNameErrorMessage] = React.useState('');
 
+  const { login } = useAuth();
+
+  const navigate = useNavigate();
+
   const validateInputs = () => {
     const email = document.getElementById('email');
     const password = document.getElementById('password');
@@ -100,18 +108,32 @@ export default function SignUp(props) {
     return isValid;
   };
 
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
+    
+    event.preventDefault();
+
     if (nameError || emailError || passwordError) {
       event.preventDefault();
       return;
     }
     const data = new FormData(event.currentTarget);
-    console.log({
-      name: data.get('name'),
-      lastName: data.get('lastName'),
+    const postData = {
+      userName: data.get('name'),
       email: data.get('email'),
       password: data.get('password'),
-    });
+    };
+
+    try{
+      const response = await axios.post("http://localhost:8080/api/auth/register", postData);
+      SetToken(response.data.token);
+      SetPlayerName(response.data.userName);
+      console.log(`token recieved: ${response.data.token}`);
+      login();
+      navigate('/game');
+    }
+    catch{
+      console.log("failed registration");
+    }
   };
 
   return (
@@ -133,14 +155,14 @@ export default function SignUp(props) {
             sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}
           >
             <FormControl>
-              <FormLabel htmlFor="name">Full name</FormLabel>
+              <FormLabel htmlFor="name">User Name</FormLabel>
               <TextField
                 autoComplete="name"
                 name="name"
                 required
                 fullWidth
                 id="name"
-                placeholder="Jon Snow"
+                placeholder="Jon_Snow_123"
                 error={nameError}
                 helperText={nameErrorMessage}
                 color={nameError ? 'error' : 'primary'}

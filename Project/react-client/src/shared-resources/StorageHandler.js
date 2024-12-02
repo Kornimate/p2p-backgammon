@@ -10,6 +10,10 @@ function GetPlayerName(){
     return name;
 }
 
+function SetPlayerName(name){
+    localStorage.setItem("playerName", name);
+}
+
 function GetPlayerGames(){
     return GetPlayerStat("Game");
 }
@@ -32,4 +36,12 @@ function GetPlayerStat(statName){
     return value;
 }
 
-export {GetPlayerName, GetPlayerGames, GetPlayerWins};
+function GetToken(){
+    return localStorage.getItem("Token");
+}
+
+function SetToken(token){
+    localStorage.setItem("Token",token);
+}
+
+export {GetPlayerName, SetPlayerName, GetPlayerGames, GetPlayerWins, GetPlayerStat, GetToken, SetToken};

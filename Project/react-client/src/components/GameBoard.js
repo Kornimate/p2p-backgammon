@@ -1,14 +1,73 @@
-import { Button } from '@mui/material';
+import { Button, CircularProgress } from '@mui/material';
 import { useState, useRef, useEffect, Fragment } from 'react';
 import boardImage from '../assets/board.png';
 import blackImage from '../assets/black_player.png';
 import whiteImage from '../assets/white_player.png';
 import "../styles/GameBoard.css";
 import GameBoardPieceHolder from './GameBoardPieceHolder.js';
+import Peer from "peerjs";
+import { GetPlayerName } from '../shared-resources/StorageHandler.js';
 
 const GameBoard = () => {
 
-    // Initial Board State
+    const [peerId, setPeerId] = useState(GetPlayerName() + "#####" +(new Date()).toLocaleString()); // Your custom ID
+    const [remotePeerId, setRemotePeerId] = useState("");
+    const [receivedMessage, setReceivedMessage] = useState("");
+    const [message, setMessage] = useState("")
+    const [connection, setConnection] = useState(null);
+    const peerInstance = useRef(null);
+
+    useEffect(() => {
+        const peer = new Peer(peerId);
+
+        peerInstance.current = peer;
+
+        peer.on("open", (id) => {
+        console.log("My peer ID is:", id);
+        setPeerId(id); // Display the custom ID
+        });
+
+        peer.on("connection", (conn) => {
+        console.log("Connected to:", conn.peer);
+        setConnection(conn);
+
+        conn.on("data", (data) => {
+            console.log("Received:", data);
+            setReceivedMessage(data);
+        });
+        });
+
+        peer.on("error", (err) => {
+        console.error("PeerJS error:", err);
+        });
+
+        return () => {
+        peer.destroy();
+        };
+    }, [peerId]);
+
+    const connectToPeer = () => {
+        const conn = peerInstance.current.connect(remotePeerId);
+        setConnection(conn);
+
+        conn.on("data", (data) => {
+            console.log("Received:", data);
+            setReceivedMessage(data);
+        });
+
+        // conn.on("open", () => {
+        // console.log("Connection is open!");
+        // });
+    };
+
+    const sendMessage = () => {
+        if (connection) {
+        connection.send(message);
+        console.log("Sent:", message);
+        } else {
+        console.error("No active connection.");
+        }
+    };
 
     const boardRef = useRef()
 
@@ -41,6 +100,8 @@ const GameBoard = () => {
     const [buttons13To24] = useState([...Array(12).keys()].map(i => (12 + i)));
 
     return (
+        // connection == null ?
+        // <CircularProgress /> :
         <div className="container">
             <div className="buttonsDiv">
                 {

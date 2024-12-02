@@ -9,6 +9,8 @@ import { styled } from '@mui/material/styles';
 import MuiCard from '@mui/material/Card';
 import ColorModeSelect from '../shared-theme/ColorModeSelect';
 import CssBaseline from '@mui/material/CssBaseline';
+import { useAuth } from "../hooks/AuthProvider";
+import { useNavigate } from "react-router-dom";
 
 const Card = styled(MuiCard)(({ theme }) => ({
     display: 'flex',
@@ -54,7 +56,15 @@ const Card = styled(MuiCard)(({ theme }) => ({
 
 const GameHomePage = (props) => {
 
-    const [playerName] = useState(GetPlayerName())
+    const [playerName] = useState(GetPlayerName());
+
+    const { logout } = useAuth();
+    const navigate = useNavigate();
+
+    function handleLogOut(){
+      logout();
+      navigate("/");
+    }
 
     return (
         <AppTheme {...props}>
@@ -72,6 +82,7 @@ const GameHomePage = (props) => {
                         <Link to="/game/stats" style={{width: "100%"}}>
                             <Button variant="outlined" sx={{width: "100%"}}>Statistics</Button>
                         </Link>
+                        <Button variant="outlined" sx={{width: "100%"}} onClick={handleLogOut}>Log Out</Button>
                 </Card>
             </Container>
         </AppTheme>

@@ -34,7 +34,7 @@ namespace ASP_Server.Controllers
         {
             logger.LogInformation($"Recieved Data: {model}");
 
-            if(string.IsNullOrWhiteSpace(model.Email) || string.IsNullOrWhiteSpace(model.Password))
+            if (string.IsNullOrWhiteSpace(model.Email) || string.IsNullOrWhiteSpace(model.Password))
                 return Unauthorized();
 
             var user = await userManager.FindByEmailAsync(model.Email);
@@ -44,19 +44,38 @@ namespace ASP_Server.Controllers
 
             var res = await signInManager.PasswordSignInAsync(user, model.Password, false, false);
 
-            if(!res.Succeeded)
+            if (!res.Succeeded)
                 return Unauthorized();
 
-            return Ok(new { Token = jWTService.GenerateJwtToken(user) });
+            return Ok(new { Token = jWTService.GenerateJwtToken(user), UserName = user.UserName });
         }
 
         [AllowAnonymous]
         [HttpPost("register")]
-        public async Task<IActionResult> Register()
+        public async Task<IActionResult> Register([FromBody] RegisterModel model)
         {
-            //TODO: make the register method
+            logger.LogInformation($"Recieved Data: {model}");
 
-            return null;
+            if (string.IsNullOrWhiteSpace(model.Email) || string.IsNullOrWhiteSpace(model.Password) || string.IsNullOrWhiteSpace(model.UserName))
+                return Unauthorized();
+
+            var user = await userManager.FindByEmailAsync(model.Email);
+
+            if (user is not null)
+                return BadRequest();
+
+            var res = await userManager.CreateAsync(new IdentityUser
+            {
+                UserName = model.UserName,
+                Email = model.Email
+            }, model.Password);
+
+            if (!res.Succeeded)
+                return StatusCode(StatusCodes.Status500InternalServerError);
+
+            user = (await userManager.FindByEmailAsync(model.Email))!;
+
+            return Ok(new { Token = jWTService.GenerateJwtToken(user), UserName = user.UserName });
         }
     }
 }

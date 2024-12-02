@@ -14,6 +14,8 @@ import AppTheme from '../shared-theme/AppTheme';
 import ColorModeSelect from '../shared-theme/ColorModeSelect';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
+import { SetPlayerName, SetToken } from '../shared-resources/StorageHandler';
+import { useAuth } from '../hooks/AuthProvider';
 
 const Card = styled(MuiCard)(({ theme }) => ({
   display: 'flex',
@@ -63,6 +65,8 @@ export default function SignIn(props) {
   const [passwordError, setPasswordError] = React.useState(false);
   const [passwordErrorMessage, setPasswordErrorMessage] = React.useState('');
 
+  const { login } = useAuth();
+
   const navigate = useNavigate();
 
   const handleSubmit = async (event) => {
@@ -80,10 +84,11 @@ export default function SignIn(props) {
 
     try{
       const response = await axios.post("http://localhost:8080/api/auth/login", postData);
-      localStorage.setItem("token",response.data.token);
-      localStorage.setItem("user",postData.email);
-      console.log(`token recieved: ${response.data.token}`)
-      navigate('/connection')
+      SetToken(response.data.token);
+      SetPlayerName(response.data.userName);
+      console.log(`token recieved: ${response.data.token}`);
+      login();
+      navigate('/game');
     }
     catch{
       console.log("invalid credentials");

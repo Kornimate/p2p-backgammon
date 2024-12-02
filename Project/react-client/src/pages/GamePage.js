@@ -1,9 +1,9 @@
-import GameBoardNew from "../components/GameBoard"
+import GameBoard from "../components/GameBoard"
 
 const GamePage = () => {
     return (
         <div>
-            <GameBoardNew />
+            <GameBoard />
         </div>
     )
 }
