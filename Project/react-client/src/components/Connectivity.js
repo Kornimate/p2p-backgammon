@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import * as signalR from '@microsoft/signalr'
 import { IdSeparator } from '../constants/Constants';
+import { GetPlayerGames, GetToken } from '../shared-resources/StorageHandler';
 
 const Connectivity = () => {
 
@@ -14,7 +15,7 @@ const Connectivity = () => {
         let signalRConn = new signalR.HubConnectionBuilder()
         .withUrl("http://localhost:8080/matchMaking",{
             accessTokenFactory: () =>{
-                return localStorage.getItem("token")
+                return GetToken();
             }
         })
         .build();
@@ -23,33 +24,33 @@ const Connectivity = () => {
             
         },[]);
 
-        useEffect(() => {
-            if(connection){
-                connection.on("SendMessage", data => {
-                    console.log(`Sent: ${data}`);
-                });
-        
-                connection.on("GetId", data => {
-                    setId(data);
-                    console.log(`Id assigned: ${data}`);
-                    connection.invoke("PublishUserData", `${localStorage.getItem("user")}${IdSeparator}${0}`)
-                });
-        
-                connection.on("RecieveMessage", data => {
-                    console.log(`Recieved: ${data}`);
-                });
+    useEffect(() => {
+        if(connection){
+            connection.on("SendMessage", data => {
+                console.log(`Sent: ${data}`);
+            });
+    
+            connection.on("GetId", data => {
+                setId(data);
+                console.log(`Id assigned: ${data}`);
+                connection.invoke("PublishUserData", `${localStorage.getItem("user")}${IdSeparator}${GetPlayerGames()}`)
+            });
+    
+            connection.on("RecieveMessage", data => {
+                console.log(`Recieved: ${data}`);
+            });
 
-                connection.on("StartGame", data =>{
-                    console.log(`Starting game with: ${data}`);
-                    connection.stop();
+            connection.on("StartGame", data =>{
+                console.log(`Starting game with: ${data}`);
+                connection.stop();
+            });
+    
+            connection.start()
+                .then(() => {
+                    console.log("connection established")
                 });
-        
-                connection.start()
-                    .then(() => {
-                        console.log("connection established")
-                    });
-            }
-        },[connection])
+        }
+    },[connection])
 
     return <div>
         {id}

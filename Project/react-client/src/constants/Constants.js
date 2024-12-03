@@ -1,3 +1,5 @@
 const IdSeparator = "#$#";
 
-export { IdSeparator };
+const NameSeparator = "---"
+
+export { IdSeparator, NameSeparator };
