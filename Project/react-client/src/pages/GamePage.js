@@ -6,19 +6,20 @@ import { GetPlayerGames, GetToken } from '../shared-resources/StorageHandler';
 import Peer from "peerjs";
 import { GetPlayerName } from "../shared-resources/StorageHandler";
 import { CircularProgress } from "@mui/material";
+import { useNavigate } from "react-router-dom";
 
 const GamePage = () => {
 
-    const [connection, setConnection] = useState(null);
+    const [connectionSignalR, setConnectionSignalR] = useState(null);
     const [connectionPJS, setConnectionPJS] = useState(null);
-    const [connectedToPeer, setConnectedToPeer] = useState(false);
-    const [id, setId] = useState('');
-    const [opponent, setOpponent] = useState([]);
-    const [peerId, setPeerId] = useState(GetPlayerName() + "#####" +(new Date()).toLocaleString()); // Your custom ID
+    const [opponent, setOpponent] = useState(null);
+    const [peerId, setPeerId] = useState(""); // Your custom ID
     const peerInstance = useRef(null);
 
+    const navigate = useNavigate();
+
     useEffect(() => {
-        const peer = new Peer(peerId);
+        const peer = new Peer();
 
         peerInstance.current = peer;
 
@@ -28,20 +29,25 @@ const GamePage = () => {
         });
 
         peer.on("connection", (conn) => {
-            console.log("Connected to:", conn.peer);
-            setConnectionPJS(conn);
+            console.log("Got connection from:", conn.peer);
+
+            conn.on("data", (data) => {
+                console.log('Received:', data);
+            });
         });
+
 
         peer.on("error", (err) => {
             console.error("PeerJS error:", err);
-            //naviate back to home if error
+            alert("Error in connection, navigating back to home page.")
+            navigate("/game");
         });
 
         return () => {
             peer.destroy();
-            //naviate back to home if error
         };
-    }, [peerId]);
+
+    });
 
     useEffect(() => {
 
@@ -56,51 +62,79 @@ const GamePage = () => {
         })
         .build();
 
-        setConnection(signalRConn);
+        setConnectionSignalR(signalRConn);
             
         },[peerId]);
 
     useEffect(() => {
-        if(connection){
-            connection.on("SendMessage", data => {
+        if(connectionSignalR && peerId){
+            connectionSignalR.on("SendMessage", data => {
                 console.log(`Sent: ${data}`);
             });
     
-            connection.on("GetId", data => {
-                setId(data);
-                console.log(`Id assigned: ${data}`);
-                connection.invoke("PublishUserData", `${GetPlayerName()}${NameSeparator}${peerId}${IdSeparator}${GetPlayerGames()}`)
+            connectionSignalR.on("GetId", data => {
+                console.log(`Id assigned from SignalR Hub: ${data}`);
+                connectionSignalR.invoke("PublishUserData", `${data}${NameSeparator}${peerId}${NameSeparator}${GetPlayerName()}${IdSeparator}${GetPlayerGames()}`)
             });
     
-            connection.on("RecieveMessage", data => {
+            connectionSignalR.on("RecieveMessage", data => {
                 console.log(`Recieved: ${data}`);
             });
 
-            connection.on("StartGame", data =>{
+            connectionSignalR.on("StartGame", data =>{
                 console.log(`Starting game with: ${data}`);
                 const opponentData = data.split(NameSeparator);
                 setOpponent(opponentData);
-                connection.stop();
+                connectionSignalR.stop();
             });
     
-            connection.start()
+            connectionSignalR
+                .start()
                 .then(() => {
                     console.log("connection established")
                 });
         }
-    },[connection]);
+    },[connectionSignalR, peerId]);
 
     useEffect(() => {
         if(!opponent)
             return;
-        ///connect to opponent
+        
+        const conn = peerInstance.current.connect(opponent[0]);
+
+        setConnectionPJS(conn);
+
+        conn.on('open', () => {
+            console.log('Connected to:', opponent[0]);
+        });
+      
+        conn.on("error", (err) => {
+            console.error("PeerJS connection error:", err);
+        });
+    
+        conn.on("close", () => {
+            console.log("Connection closed with opponent.");
+            setConnectionPJS(null);
+        });
+    
+        setInterval(() => {
+            if(conn){
+                conn.send("Hello");
+                console.log('Sent:', "Hello");
+            }
+        },5000);
+
+        return () => {
+            if (conn) conn.close();
+        };
+
 
     }, [opponent])
 
     return (
         <div>
             {
-                connectedToPeer == null ?
+                connectionPJS === null ?
                 <CircularProgress /> :
                 <GameBoard />
             }

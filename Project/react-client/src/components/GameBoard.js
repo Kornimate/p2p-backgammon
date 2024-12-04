@@ -112,7 +112,7 @@ const GameBoard = ({ peerjsConnection, opponentName}) => {
                     ))
                 }
             </div>
-            <div class="knockedOutPiecesDivHolder">
+            <div className="knockedOutPiecesDivHolder">
                 <div className="knockedOutDiv">
                     <img alt="" src={blackImage} onClick={BlackKnockedOutClicked} />
                     <div>{knockedOutPieces[0]}</div>

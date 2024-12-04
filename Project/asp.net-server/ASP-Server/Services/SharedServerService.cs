@@ -17,8 +17,7 @@ namespace ASP_Server.Services
         public async Task<bool> AddToCollectionAsync(string id, int gameNum)
         {
             bool res = usersInGroups.TryAdd(id, GetGroupForUser(gameNum));
-
-            WriteCollectionToConsole($"user added to collection: {id} {{{res}}}");
+            WriteCollectionToConsole($"user added to collection: {id} {{{res}}}", usersInGroups);
 
             return await Task.FromResult(res);
         }
@@ -27,14 +26,14 @@ namespace ASP_Server.Services
         {
             bool res = usersInGroups.TryRemove(id, out _);
 
-            WriteCollectionToConsole($"user removed from collection: {id} {{{res}}}");
+            WriteCollectionToConsole($"user removed from collection: {id} {{{res}}}", usersInGroups);
 
             lock (aloneUsers)
             {
-                res = aloneUsers.Remove(id); 
+                res = aloneUsers.Remove(id);
             }
 
-            WriteCollectionToConsole($"user removed from alones: {id} {{{res}}}");
+            WriteCollectionToConsole($"user removed from alones: {id} {{{res}}}", usersInGroups);
 
             return await Task.FromResult(res);
         }
@@ -47,13 +46,17 @@ namespace ASP_Server.Services
 
             if (userDatas.Length < 1)
             {
-                return (false, [userDatas[0].Key, userDatas[0].Value]);
+                return (false, null);
             }
 
-            if (userDatas.Length < 2)
-                return (false, [userDatas[0].Key]);
-
             bool success = true;
+
+            if (userDatas.Length < 2)
+            {
+                usersInGroups.TryRemove(userDatas[0].Key, out var _);
+                WriteCollectionToConsole("removed:", usersInGroups);
+                return (false, [userDatas[0].Key, userDatas[0].Value]);
+            }
 
             for (int i = 0; i < userDatas.Length; i++)
             {
@@ -72,6 +75,8 @@ namespace ASP_Server.Services
                 aloneUsers.Add(userData[0], userData[1]);
             }
 
+            WriteCollectionToConsole($"alone users, user added", aloneUsers);
+
             return Task.CompletedTask;
         }
 
@@ -87,17 +92,20 @@ namespace ASP_Server.Services
                 if (aloneUsers.Count % 2 == 0)
                 {
                     pairBase = [.. aloneUsers.OrderBy(x => x.Value)];
-                    pairBase.Clear();
+                    aloneUsers.Clear();
                 }
                 else
                 {
                     pairBase = [.. aloneUsers.OrderBy(x => x.Value)];
                     var last = pairBase[^1];
-                    pairBase.Clear();
-                    pairBase.Add(last);
+                    aloneUsers.Clear();
+                    aloneUsers.Add(last.Key, last.Value);
 
                 }
+
+                WriteCollectionToConsole("alone users ", aloneUsers);
             }
+
 
             List<(string, string)> pairs = [];
 
@@ -109,12 +117,12 @@ namespace ASP_Server.Services
             return Task.FromResult(pairs);
         }
 
-        private void WriteCollectionToConsole(string startText)
+        private void WriteCollectionToConsole(string startText, IDictionary<string, string> collection)
         {
             Console.WriteLine(startText);
             Console.WriteLine("-------------------");
 
-            foreach (var user in usersInGroups)
+            foreach (var user in collection)
             {
                 Console.WriteLine($"{user.Key} : {user.Value}");
             }

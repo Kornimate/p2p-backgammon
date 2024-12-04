@@ -36,6 +36,12 @@ namespace ASP_Server.HostedServices
 
             while (!cancellationToken.IsCancellationRequested)
             {
+                foreach (var pair in await sharedService.MakePairsFromRemainder())
+                {
+                    await hubContext.Clients.Client(ServerConstants.GetPlayerSignalRId(pair.Item1)).SendAsync(ServerConstants.StartGameAction, ServerConstants.GetPlayerPeerIdAndName(pair.Item2), cancellationToken);
+                    await hubContext.Clients.Client(ServerConstants.GetPlayerSignalRId(pair.Item2)).SendAsync(ServerConstants.StartGameAction, ServerConstants.GetPlayerPeerIdAndName(pair.Item1), cancellationToken);
+                }
+
                 foreach (var group in ServerConstants.GroupNames)
                 {
                     try
@@ -44,8 +50,8 @@ namespace ASP_Server.HostedServices
 
                         if (playersQuery.Item1)
                         {
-                            await hubContext.Clients.Client(playersQuery.Item2![0]).SendAsync(ServerConstants.StartGameAction, playersQuery.Item2[1], cancellationToken);
-                            await hubContext.Clients.Client(playersQuery.Item2![1]).SendAsync(ServerConstants.StartGameAction, playersQuery.Item2[0], cancellationToken);
+                            await hubContext.Clients.Client(ServerConstants.GetPlayerSignalRId(playersQuery.Item2![0])).SendAsync(ServerConstants.StartGameAction, ServerConstants.GetPlayerPeerIdAndName(playersQuery.Item2[1]), cancellationToken);
+                            await hubContext.Clients.Client(ServerConstants.GetPlayerSignalRId(playersQuery.Item2![1])).SendAsync(ServerConstants.StartGameAction, ServerConstants.GetPlayerPeerIdAndName(playersQuery.Item2[0]), cancellationToken);
                         }
                         else if(playersQuery.Item2 is not null)
                         {
@@ -56,12 +62,6 @@ namespace ASP_Server.HostedServices
                     {
                         Console.WriteLine(ex.Message);
                     }
-                }
-
-                foreach(var pair in await sharedService.MakePairsFromRemainder())
-                {
-                    await hubContext.Clients.Client(pair.Item1).SendAsync(ServerConstants.StartGameAction, pair.Item2, cancellationToken);
-                    await hubContext.Clients.Client(pair.Item2).SendAsync(ServerConstants.StartGameAction, pair.Item1, cancellationToken);
                 }
 
                 await Task.Delay(ServerConstants.WaitInMatchMaking, cancellationToken);
