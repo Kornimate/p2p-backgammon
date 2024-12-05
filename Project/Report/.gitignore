@@ -18,8 +18,7 @@ tags
 *.toc
 *.xml
 *.numbers
-ClassicReport.pdf
 ClassicReport-blx.bib
-ClassicThesis.pdf
 ClassicThesis-blx.bib
 web/**
+
