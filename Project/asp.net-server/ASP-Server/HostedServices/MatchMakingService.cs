@@ -38,8 +38,9 @@ namespace ASP_Server.HostedServices
             {
                 foreach (var pair in await sharedService.MakePairsFromRemainder())
                 {
-                    await hubContext.Clients.Client(ServerConstants.GetPlayerSignalRId(pair.Item1)).SendAsync(ServerConstants.StartGameAction, ServerConstants.GetPlayerPeerIdAndName(pair.Item2), cancellationToken);
-                    await hubContext.Clients.Client(ServerConstants.GetPlayerSignalRId(pair.Item2)).SendAsync(ServerConstants.StartGameAction, ServerConstants.GetPlayerPeerIdAndName(pair.Item1), cancellationToken);
+                    var isBlack = ServerConstants.DecideIfPlayerIsBlack();
+                    await hubContext.Clients.Client(ServerConstants.GetPlayerSignalRId(pair.Item1)).SendAsync(ServerConstants.StartGameAction, ServerConstants.GetPlayerPeerIdAndNameAndColor(pair.Item2, isBlack), cancellationToken);
+                    await hubContext.Clients.Client(ServerConstants.GetPlayerSignalRId(pair.Item2)).SendAsync(ServerConstants.StartGameAction, ServerConstants.GetPlayerPeerIdAndNameAndColor(pair.Item1, !isBlack), cancellationToken);
                 }
 
                 foreach (var group in ServerConstants.GroupNames)
@@ -50,8 +51,9 @@ namespace ASP_Server.HostedServices
 
                         if (playersQuery.Item1)
                         {
-                            await hubContext.Clients.Client(ServerConstants.GetPlayerSignalRId(playersQuery.Item2![0])).SendAsync(ServerConstants.StartGameAction, ServerConstants.GetPlayerPeerIdAndName(playersQuery.Item2[1]), cancellationToken);
-                            await hubContext.Clients.Client(ServerConstants.GetPlayerSignalRId(playersQuery.Item2![1])).SendAsync(ServerConstants.StartGameAction, ServerConstants.GetPlayerPeerIdAndName(playersQuery.Item2[0]), cancellationToken);
+                            var isBlack = ServerConstants.DecideIfPlayerIsBlack();
+                            await hubContext.Clients.Client(ServerConstants.GetPlayerSignalRId(playersQuery.Item2![0])).SendAsync(ServerConstants.StartGameAction, ServerConstants.GetPlayerPeerIdAndNameAndColor(playersQuery.Item2[1], isBlack), cancellationToken);
+                            await hubContext.Clients.Client(ServerConstants.GetPlayerSignalRId(playersQuery.Item2![1])).SendAsync(ServerConstants.StartGameAction, ServerConstants.GetPlayerPeerIdAndNameAndColor(playersQuery.Item2[0], !isBlack), cancellationToken);
                         }
                         else if(playersQuery.Item2 is not null)
                         {

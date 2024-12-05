@@ -7,11 +7,13 @@ import Peer from "peerjs";
 import { GetPlayerName } from "../shared-resources/StorageHandler";
 import { CircularProgress } from "@mui/material";
 import { useNavigate } from "react-router-dom";
+import "../styles/GamePage.css"
 
 const GamePage = () => {
 
     const [connectionSignalR, setConnectionSignalR] = useState(null);
-    const [connectionPJS, setConnectionPJS] = useState(null);
+    const [connectionToWrite, setConnectionToWrite] = useState(null);
+    const [connectionToListen, setConnectionToListen] = useState(null);
     const [opponent, setOpponent] = useState(null);
     const [peerId, setPeerId] = useState(""); // Your custom ID
     const peerInstance = useRef(null);
@@ -31,9 +33,7 @@ const GamePage = () => {
         peer.on("connection", (conn) => {
             console.log("Got connection from:", conn.peer);
 
-            conn.on("data", (data) => {
-                console.log('Received:', data);
-            });
+            setConnectionToListen(conn);
         });
 
 
@@ -47,7 +47,7 @@ const GamePage = () => {
             peer.destroy();
         };
 
-    });
+    }, []);
 
     useEffect(() => {
 
@@ -83,7 +83,8 @@ const GamePage = () => {
 
             connectionSignalR.on("StartGame", data =>{
                 console.log(`Starting game with: ${data}`);
-                const opponentData = data.split(NameSeparator);
+                const opponentData = JSON.parse(data);
+                console.log(opponentData)
                 setOpponent(opponentData);
                 connectionSignalR.stop();
             });
@@ -100,12 +101,11 @@ const GamePage = () => {
         if(!opponent)
             return;
         
-        const conn = peerInstance.current.connect(opponent[0]);
-
-        setConnectionPJS(conn);
-
+        const conn = peerInstance.current.connect(opponent.PeerId);
+        
         conn.on('open', () => {
             console.log('Connected to:', opponent[0]);
+            setConnectionToWrite(conn);
         });
       
         conn.on("error", (err) => {
@@ -114,15 +114,8 @@ const GamePage = () => {
     
         conn.on("close", () => {
             console.log("Connection closed with opponent.");
-            setConnectionPJS(null);
+            setConnectionToWrite(null);
         });
-    
-        setInterval(() => {
-            if(conn){
-                conn.send("Hello");
-                console.log('Sent:', "Hello");
-            }
-        },5000);
 
         return () => {
             if (conn) conn.close();
@@ -134,9 +127,11 @@ const GamePage = () => {
     return (
         <div>
             {
-                connectionPJS === null ?
-                <CircularProgress /> :
-                <GameBoard />
+                connectionToWrite === null || connectionToListen === null?
+                <div className="container">
+                    <CircularProgress />
+                </div> :
+                <GameBoard write={connectionToWrite} listen={connectionToListen} opponentName={opponent.Name} isBlack={opponent.IsBlack}/>
             }
         </div>
     )

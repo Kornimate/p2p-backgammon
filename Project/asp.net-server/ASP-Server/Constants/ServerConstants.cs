@@ -1,4 +1,6 @@
 ﻿
+using System.Text.Json;
+
 namespace ASP_Server.Constants
 {
     public static class ServerConstants
@@ -29,9 +31,20 @@ namespace ASP_Server.Constants
             return playerInfo.Split(UserIdentifierInfoSeparator, StringSplitOptions.RemoveEmptyEntries)[0];
         }
 
-        public static string GetPlayerPeerIdAndName(string playerInfo)
+        public static string GetPlayerPeerIdAndNameAndColor(string playerInfo, bool isBlack)
         {
-            return String.Join(UserIdentifierInfoSeparator,playerInfo.Split(UserIdentifierInfoSeparator, StringSplitOptions.RemoveEmptyEntries)[1..]);
+            var playerIdAndName = playerInfo.Split(UserIdentifierInfoSeparator, StringSplitOptions.RemoveEmptyEntries)[1..];
+            return JsonSerializer.Serialize(new
+            {
+                PeerId = playerIdAndName[0],
+                Name = playerIdAndName[1],
+                IsBlack = isBlack
+            });
+        }
+
+        public static bool DecideIfPlayerIsBlack()
+        {
+            return new Random().Next(1, 101) > 50;
         }
     }
 }

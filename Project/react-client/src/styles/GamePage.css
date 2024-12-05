@@ -1,0 +1,9 @@
+.container{
+    display: block;
+    justify-content: center;
+    min-height: 100vh;
+    align-content: center;
+    overflow-x: scroll;
+    border: 1px solid black;
+    border-radius: 3px;
+}

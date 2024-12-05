@@ -1,4 +1,4 @@
-import { Button, CircularProgress } from '@mui/material';
+import { Button } from '@mui/material';
 import { useState, useRef, useEffect, Fragment } from 'react';
 import boardImage from '../assets/board.png';
 import blackImage from '../assets/black_player.png';
@@ -8,38 +8,8 @@ import GameBoardPieceHolder from './GameBoardPieceHolder.js';
 
 import { GetPlayerName } from '../shared-resources/StorageHandler.js';
 
-const GameBoard = ({ peerjsConnection, opponentName}) => {
-
-
-    const [remotePeerId, setRemotePeerId] = useState("");
-    const [receivedMessage, setReceivedMessage] = useState("");
-    const [message, setMessage] = useState("")
-    const [connection, setConnection] = useState(null);
-    const peerInstance = useRef(null);
-
-    const connectToPeer = () => {
-        const conn = peerInstance.current.connect(remotePeerId);
-        setConnection(conn);
-
-        conn.on("data", (data) => {
-            console.log("Received:", data);
-            setReceivedMessage(data);
-        });
-
-        // conn.on("open", () => {
-        // console.log("Connection is open!");
-        // });
-    };
-
-    const sendMessage = () => {
-        if (connection) {
-        connection.send(message);
-        console.log("Sent:", message);
-        } else {
-        console.error("No active connection.");
-        }
-    };
-
+const GameBoard = ({ write, listen, opponentName}) => {
+    
     const boardRef = useRef()
 
     const [board, setBoard] = useState([
@@ -48,6 +18,9 @@ const GameBoard = ({ peerjsConnection, opponentName}) => {
         [0, 5], [0, 0], [0, 0], [0, 0], [3, 0], [0, 0],   // (13 - 18)
         [5, 0], [0, 0], [0, 0], [0, 0], [0, 0], [0, 2]    // (19 - 24)
     ]);
+
+    const [buttons1To12] = useState([...Array(12).keys()].map(i => 11-i));
+    const [buttons13To24] = useState([...Array(12).keys()].map(i => (12 + i)));
 
     const [knockedOutPieces, setKnockedOutPieces] = useState([0,0]); // black and white 
 
@@ -67,8 +40,16 @@ const GameBoard = ({ peerjsConnection, opponentName}) => {
         setKnockedOutPieces([...temp])
     }
 
-    const [buttons1To12] = useState([...Array(12).keys()].map(i => 11-i));
-    const [buttons13To24] = useState([...Array(12).keys()].map(i => (12 + i)));
+    useEffect(() => {
+        listen.on("data", (data) => {
+            console.log('Received:', data);
+        });
+
+        setInterval(() => {
+            write.send("Hello")
+            console.log("Sent Hello");
+        }, 5000);
+    }, [])
 
     return (
         <div className="container">
