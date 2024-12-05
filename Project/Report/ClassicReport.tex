@@ -105,17 +105,35 @@ As illustrated in figure \ref{fig:backgammon_board_setup}, and briefly described
     \label{fig:backgammon_board_setup}
 \end{figure}
 
-\section{Networking}
-There are two types of networking used in this project, the first is the server that the players has to connect to in order to get matched with another player, the second is the peer-to-peer connection that is established between the two players once they are matched. As briefly mentioned in the general architecture section, the server is active at all times and is used to connect the players to each other, once two players are connected to each other the server disconnects from the server and from that point on the players are connected only to each other. Given that we want to use the server as little as possible, the statistics of the players are stored in the browser, as we will cover in section \ref{sec:security} this poses a minor security risk. There is also the possibility of a player clearing their browser cache and thus losing their statistics, this problem could be solved in many ways, one way could be to store the statistics in a central database, or as we would prefer, using a peer-to-peer database, it would even be possible to use a blockchain to store the statistics, it might be a bit overkill, but it is a possibility. As mentioned earlier we simply store the statistics in the browser, and thus none of the mentioned solutions are implemented, we are however aware of the problem and have thought about possible solutions.
-
 \section{User Interface}
-The user interface is primarily implemented using React. The first thing a player will see is the games home page where they can register or login. Once a player has registered their information is stored in a database, and they can log in. Once a player is logged in they are put in a lobby where they can either get matched with another player or go to a statistics page. Note that even though the statistics page is mentioned, and the pages does exist the functionality is not implemented.
+The user interface is written primarily using React, and ofcause some JavaScript, html and css is used as well. When a player first enters the page they are met with the home page, where they can choose to either register or login. Once a player has registered their information is send to the server where it is stored in a database. Once a player logs in their credentials are checked against the database and if they are correct the player is redirected to a lobby where they can either get matched with another player, more on player matching in the networking section, or go to a statistics page. Note that even though the statistics page is mentioned, and the pages does exist the functionality is not implemented. The statistics page would be a page where a player can see how many games they have won, lost, their win rate, if time had permitted it, it would have been possible to see the statistics of other players as well, along with a score board. There is some security concerns with this, as we will cover in the security section, but as it is not implement neither is the security measures. 
 
-When they are matched by the server with another player in their player group the game begins. Once the players are matched they are connected to each other using PeerJS and the game begins. The game is played on a board that is displayed to both players, the board is a standard backgammon board with 24 points, 12 on each side.
+When two players are matched by the server with oneanother the game begins. Once the players are matched they are connected to each other using PeerJS and the game begins.
+The game is played on a standard backgammon board with 24 points, 12 on each side. The whole user interface is designed to be intuitive and user-friendly. Everything the user will see is relatively simple in the design, partly because the game itself is rather simple, but also because we wanted to keep the design simple and clean. 
 
-The whole user interface is designed to be intuitive and user-friendly. Everything the user will see is relatively simple in the design, partly because the game itself is rather simple, but also because we wanted to keep the design simple and clean. 
+The game board is implemented using the GameBoard component which uses various components to display the pieces and handle user interactions. The styling for the user interface is managed using CSS and images, the images are used to display the pieces and the board, thus we as developers do not have to worry about the styling of the pieces and the board, as it is handled by the images.  
 
-The game board itself is implemented using the GameBoard component which uses various components to display the pieces and handle user interactions. The styling for the user interface is managed using CSS and images, the images are used to display the pieces and the board itself. 
+\section{Networking}
+There are two types of networking used in this project, the first is the server that the players has to connect to in order to get matched with another player, this happens automatically when a player logs in to the home page of the game. Once the player has logged the server til be aware of the player and will later match the player with another player. The server is a rather simple as it does not have much work to do, it primary role is handle user authentication and then match players. The server is written in C\# and uses ASP.NET as the framework for setting up the server. At the moment the server is running as localhost and is not visible to any devises outside the local network, if we were to launch this program as a real world application it would of cause be hosted on a server appropriate for the task. The second connection is the peer-to-peer connected established between two players once they are connected by the server. As briefly mentioned in the general architecture section, once the connection between the two players are established they disconnects from the server, as it is no longer needed. 
+Given that we want to use the server as little as possible, the statistics of the players are stored in the browser, as we will cover in section \ref{sec:security} this poses a minor security risk. There is also the possibility of a player clearing their browser cache and thus losing their statistics, this problem could be solved in many ways, one way could be to store the statistics in a central database much like the users information is sotred in one, we would however perfer to use the server as little as possible, so this is not really an option for us. Another probability is using a peer-to-peer database, thus ensuring that we continue using a mainly peer-to-peer distributed system. It would even be possible to use a blockchain to store the statistics, it might be a bit overkill for our purpose, but it is a possibility. As mentioned earlier we simply store the statistics in the browser, and thus none of the mentioned solutions are implemented, we are however aware of the problem and have thought about possible solutions.
+
+\section{Player Matching}
+We have talked some about the matching of players, but not exactly how it works. The goal of the player matching is for the match to be as fair as possible, it would be no fun for either of the players to get matched with one from a different leage. The players are put into one of 6 ggroupes based on the number of wins and if possible the players are matched with someone from their own group. However when there are few players, or even many, it might be the case that there is two player from two different groups where they are the player in that group, in such a case we match those players even though the game might no be fair for the player, but  at least they get to play. One way to make the game more fair is to allow the player with the least skill to remove some of his pieces, thus allowing that player a headstart. The amount of pieces to remove has to be determined either by some standard rule or in collaboration with an expert, as we are not qualified.
+
+
+\section{Moving the pieces}
+The positions of the pieces on the board are stored in two arrays. One describes the number of pieces that are currently on the bar, the other array saves the posion of all the pieces on the rest of the board. 
+After each move, the validity has to be checked to ensure each player can only make legal moves. 
+For this we need to check for:
+\begin{itemize}
+  \item White can only move clockwise.
+  \item Black can only move counter clockwise.
+  \item If there are two or more checkers of one color on a position, the other color cannot place its checkers on that field. 
+  \item The checkers of one color cannot be moved more than the sum of the two dice the player rolled.
+  \item All checkers of one color have to be in the home board before they can be beared off. 
+  \item A player can only move his pieces.
+  \item Only the player in turn can make a move.
+\end{itemize}
 
 \section{Implementation}
 Our project uses multiple programming languages and technologies to implement that game and server connection to connect the players. The server part is written primary in C\# and uses ASP.NET as the framework for setting up the server. The game itself is written in JavaScript and primarily uses the React library for the user interface.
@@ -142,6 +160,9 @@ There is a small caveat to the protocol, if a player is able to brute force the 
 
 A second security problem that is worth the at least have thought about is the possibility of a player to manipulate the number of games won. It is a problem that we have not taken security measures against, the main reason is that if a player is able to manipulate the number of games won, the player is really only cheating themselves. Given that players are matched based on the number of games won, the player will be matched with players that are better than them, and thus the cheating player will properly just lose the game. Furthermore, there is currently no way to profit monetarily from this game. Now that we have covered that there is no incentive to falsely increase the number of games won, a player might be lower the number of games won to get matched with players that are worse than them, this is not a new problem as a player can simply make a new account and get matched with players on the same level as the new account. This is a problem that is inherent to all games that are based on the number of games won, and is not something that we have taken measures against.
 
+%% Stealing the cookies of another player
+We have covered how a player can manipulate their own score, but not if they can manipulate the score of other players. This might be possible by performing an attack with the aim to steal the cookie. % encrypting the results 
+
 
 \section{Backlog}
 The following is a list of features that we would have liked to implement, but did not have time to implement. Some of the features are not essential to the game, but would have been nice to have. The features are listed in no particular order.
@@ -158,6 +179,8 @@ The following is a list of features that we would have liked to implement, but d
 \label{cha:evaluation}
 
 
+\section{Tests}
+Due to the high level of interactive and graphical nature of this project and backgammon itself, most of the testing has been done manually, both because a test does not really tell if a design is pretty or intuitive, and because the manual testing helpes us understand how the system behave. While automated testing is definitely useful have focused on manual tests. 
 
 
 
