@@ -193,13 +193,18 @@ The following is a list of features that we would have liked to implement, but d
 \end{itemize}
 
 
+
+
 \chapter{Evaluation \& Conclusion}
 \label{cha:evaluation}
-
 
 \section{Tests}
 Due to the high level of interactive and graphical nature of this project and backgammon itself, most of the testing has been done manually, both because a test does not really tell if a design is pretty or intuitive, and because the manual testing helpes us understand how the system behave. While automated testing is definitely useful have focused on manual tests. 
 
+\section{Cost of Distribution}
+Given that we have chosen to use a peer-to-peer network where the peers are equal, i.e. no peer has more influence than the other, it means that one can not nessesarily trust the other peer. As we have seen in the security section, there is a need for a cryptographic protocol to ensure that a player can not gain an advantage by influencing the outcome of the die. The protocol designed is quite simple and does not require much computational power, but it does require the players to send some informatio to eachother. Lets take a look at the protocol, and see how much information is send between the players. A player has to send both the number chosen, a nonce and the hash value of the concatenation of the number and nonce. The number is a number between 1 and 6, the nonce is a 128 bit number and the hash value is a 256 bit number, thus the total amount of information send between the players is $1bit+128bits+256bits = 385bits$, for each die throw, for each turn two throws are made, thus the total amount of information send between the players is $385bits*2 = 770bits$ per turn. This is by no means a lot of information. It is however only for one turn, lets assume that each player has 15 turns, thus a total of $15*2*2 = 60$ dies has to be thrown, thus the total amount of information send between the players for an entire game is $770bits*60 = 46200bits = 5.775kB$. Just for the dies. Now lets look at the state of the board, a move in backgammon is denoted as $4-2:\; 10/6\; 8/6$ where $4-2$ denotes that a four and two was thrown, $10/6$ denotes that a piece was moved from position 10 to 6 and $8/6$ denotes that a piece was moved from position 8 to 6. Such a message can be encoded as 10 bits, thus the total amount of information send between the players for an entire game is $10bits*15*2 = 300bits = 37.5B$. Thus the total amount of information send between the players for an entire game is $5.775kB + 37.5B = 5.8125kB$. This is by no means a lot of information, and the cost of distribution is quite low. 
+
+If we were to have implemented the die throw and the board state in a trusted third party, the amount of information that had to be send between the players would be significantly lower, there would be no need for hashes or nonces, the only information that had to be send between the players would be the board state and the die throw. The die throw is a single bit,, where the board state is 8 bits, given that the server knows the dies values. The 8 bits first is sent from the player that made the move to the third party and then from the third party to the other player. The amount of information for the dies is thus $15*2*2 = 60bits = 7.5B$ and the amount of information for the board state is $15*2*8*2 = 480bits = 60B$, thus the total amount of information send between the players for an entire game is $7.5B + 60B = 67.5B$. This is significantly lower than the amount of information send between the players in a peer-to-peer network. This would though require a trusted third party, which is not desirable in a peer-to-peer network.
 
 
 \appendix
