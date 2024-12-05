@@ -135,10 +135,7 @@ For this we need to check for:
   \item Only the player in turn can make a move.
 \end{itemize}
 
-\section{Implementation}
-Our project uses multiple programming languages and technologies to implement that game and server connection to connect the players. The server part is written primary in C\# and uses ASP.NET as the framework for setting up the server. The game itself is written in JavaScript and primarily uses the React library for the user interface.
-
-\subsection{Security}
+\section{Security}
 \label{sec:security}
 The major security concern in this project is ensuring that it is with high probability not possible for one of the players to cheat by convincing the opponent that the die he threw was different from what it actually was. In many instances like this there is a third party server that ensures that the parties playing the game is not cheating, but in our case where the game is distributed using a peer-to-peer network, we can not use a third party server as then it would not really be a peer-to-peer network. To solve this problem we have designed a cryptographic protocol that with high probability ensures that the players can not cheat. The protocol is as follows: 
 
@@ -164,7 +161,28 @@ A second security problem that is worth the at least have thought about is the p
 We have covered how a player might be able to manipulate their own score, but not if they can manipulate the score of other players. Given that the player statistics is currently stored in the browser as a cookie, it might be possible for an adversary to steal the cookie and thus manipulate the score of the player. The attack is quite cumbersome and requires more knowlage than the average backgammon player has, we have not taken measures against this possible attack, as it beyond the scope of this project. The problem can however be avoided by encrypting the cookie using a player specific key, though this introduces a new array of problems such as key management and key distribution. Another possibility is just storing the statistics in some other manner, such solutions have been mentioned, but again it is not something that we have implemented.
 
 
-\section{Backlog}
+\section{Implementation}
+Our project uses multiple programming languages and technologies to implement that game and server connection to connect the players. The server part is written primary in C\# and uses ASP.NET as the framework for setting up the server. The game itself is written in JavaScript and primarily uses the React library for the user interface.
+
+Below is a list of how the project is structured and what the most central files and folder are.
+\begin{itemize}
+  \item \textbf{react-client/scr}
+  \begin{itemize}
+    \item \textbf{components:} Contains all the components that is used on the client side of the game. Each component is responsible for a specific part of the game, the \textit{GameBoard.js} component is responsible for rendering the board and handling the game logic. \textit{SignIn.js} and \textit{SignUp.js} are responsible for handling the user authentication. The components like the name suggests are individual components that is responsible for a specific part of the game. 
+    \item \textbf{pages:} The pages folder contains the different pages that is used in the program, such as the home page, the lobby and game page. Where the components are responsible for a specific part of the game, the pages are responsible for the pages that the components are rendered on.
+    \item \textbf{routes:} The routes folder contains the different routes that the user can take in the game, such as the home page, the lobby and the game page. The routes are responsible for ensureing that the user is redirected to the correct page when an action is taken.
+  \end{itemize}
+  \item \textbf{asp.net-server/ASP-Server:}
+  \begin{itemize}
+    \item \textbf{Controllers:}
+    \item \textbf{Models:}
+    \item \textbf{Services:}
+    \end{itemize}
+\end{itemize}
+
+
+
+\subsection{Backlog}
 The following is a list of features that we would have liked to implement, but did not have time to implement. Some of the features are not essential to the game, but would have been nice to have. The features are listed in no particular order.
 \begin{itemize}
   \item \textbf{Statistics:} A page where the player can see their statistics, such as number of games won, number of games lost, win rate etc.
