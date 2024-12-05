@@ -3,7 +3,11 @@
 # Networking
 * networking diagram of peers and server, database
 * sign up & log in
-* can a user see/search for other users? communication between users?
+* are usernames unique? 
+* does the username get displayed while playing?
+* can a user see/search for other users? communication between users via chat or something?
+* restrictions on password? 
+* forgot password
 
 # Matchmaking
 * How are players matched?      **Mikkel**
