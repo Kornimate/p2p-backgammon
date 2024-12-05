@@ -66,7 +66,7 @@
 Backgammon is one of the oldest games - and yet still very popular until this day. The oldest record of Backgammon with the rules as we know and play them nowadays, reaches back to the 17th century. 
 The game combines elements of skill and luck, which make each round unique. Although the rules are fairly easy to learn, the players are required to engage in careful decision making and strategic planning.
 The inherent complexity of the game and high skill ceiling are perfect conditions for competitions and tournaments and allow each player to grow and refine their skill. \\
-In this project we attempt to build Backgammon ourselves, while appying the knowledge we gained from the lecture. \\
+In this project we build Backgammon ourselves, while appying the knowledge we gained from this course as well previous courses. \\
 Players are going to connect to a server and further communicate directly with each other as peers. %need reference to section
 Through a matchmaking system, the players will be able to queue up and get matched against each other according to their skill level. 
 At the end of each game the skill level of the players will get updated, thus ensuring fair games.\\
@@ -187,14 +187,15 @@ Below is a list of how the project is structured and what the most central files
   \item \textbf{react-client/scr}
   \begin{itemize}
     \item \textbf{components:} Contains all the components that is used on the client side of the game. Each component is responsible for a specific part of the game, the \textit{GameBoard.js} component is responsible for rendering the board and handling the game logic. \textit{SignIn.js} and \textit{SignUp.js} are responsible for handling the user authentication. The components like the name suggests are individual components that is responsible for a specific part of the game. 
-    \item \textbf{pages:} The pages folder contains the different pages that is used in the program, such as the home page, the lobby and game page. Where the components are responsible for a specific part of the game, the pages are responsible for the pages that the components are rendered on.
+    \item \textbf{pages:} The pages folder contains the different pages that is used in the program, such as the home page, tlhe lobby and game page. Where the components are responsible for a specific part of the game, the pages are responsible for the pages that the components are rendered on.
     \item \textbf{routes:} The routes folder contains the different routes that the user can take in the game, such as the home page, the lobby and the game page. The routes are responsible for ensureing that the user is redirected to the correct page when an action is taken.
   \end{itemize}
   \item \textbf{asp.net-server/ASP-Server:}
   \begin{itemize}
-    \item \textbf{Controllers:}
-    \item \textbf{Models:}
-    \item \textbf{Services:}
+    \item \textbf{Controllers:} We have one controller in the project, and it is responsible for handling the http requests that the server receives. The controller is responsible for handling the user authentication and the player matching.
+    \item \textbf{Hubs:} The hubs responsible for handling the websocket connections between the player and the server. It will monitor the players in the match making queue and accept connection from the players and disconnects when the players are matched. 
+    \item \textbf{Models:} The models are responsible for generating the database and the tables in the database, but also the connection to the database.   
+    \item \textbf{Services:} This is where the logic of the server is implemented, the services are responsible the logic that is used when matchmaking, as well and the server services.
     \end{itemize}
 \end{itemize}
 
@@ -203,11 +204,12 @@ Below is a list of how the project is structured and what the most central files
 \subsection{Backlog}
 The following is a list of features that we would have liked to implement, but did not have time to implement. Some of the features are not essential to the game, but would have been nice to have. The features are listed in no particular order.
 \begin{itemize}
-  \item \textbf{Statistics:} A page where the player can see their statistics, such as number of games won, number of games lost, win rate etc.
+  \item \textbf{Statistics:} See other players statistics, such as win rate, number of games won, lost etc. 
   \item \textbf{Distributed Database:} As mentioned in the networking section, the statistics are stored in the browser, this poses a security risk, and it would have been nice to have a distributed database to store the statistics.
   \item \textbf{Double Dice:} When a player throws a double, the player can move four times the value of the die, this is not implemented in the game.
   \item \textbf{Crawford rule:} The Crawford rule states that if a player is one point away from winning the game, the opponent can not double the game. 
   \item \textbf{Handicap:} If a player has a higher win rate than the opponent, the opponent can remove a number of pieces from the board before the game begins.
+  \item \textbf{Starting:}
 \end{itemize}
 
 
@@ -217,7 +219,7 @@ The following is a list of features that we would have liked to implement, but d
 \label{cha:evaluation}
 
 \section{Tests}
-Due to the high level of interactive and graphical nature of this project and backgammon itself, most of the testing has been done manually, both because a test does not really tell if a design is pretty or intuitive, and because the manual testing helpes us understand how the system behave. While automated testing is definitely useful have focused on manual tests. 
+Due to the high level of interactive and graphical nature of this project and backgammon itself, most of the testing has been done manually, both because a test does not really tell if a design is pretty or intuitive, and because the manual testing helpes us understand how the system behave. While automated testing is definitely useful we have chosen to focused on manual tests. 
 
 \section{Cost of Distribution}
 Given that we have chosen to use a peer-to-peer network where the peers are equal, i.e. no peer has more influence than the other, it means that one can not nessesarily trust the other peer. As we have seen in the security section, there is a need for a cryptographic protocol to ensure that a player can not gain an advantage by influencing the outcome of the die. The protocol designed is quite simple and does not require much computational power, but it does require the players to send some informatio to eachother. Lets take a look at the protocol, and see how much information is send between the players. A player has to send both the number chosen, a nonce and the hash value of the concatenation of the number and nonce. The number is a number between 1 and 6, the nonce is a 128 bit number and the hash value is a 256 bit number, thus the total amount of information send between the players is $1bit+128bits+256bits = 385bits$, for each die throw, for each turn two throws are made, thus the total amount of information send between the players is $385bits*2 = 770bits$ per turn. This is by no means a lot of information. It is however only for one turn, lets assume that each player has 15 turns, thus a total of $15*2*2 = 60$ dies has to be thrown, thus the total amount of information send between the players for an entire game is $770bits*60 = 46200bits = 5.775kB$. Just for the dies. Now lets look at the state of the board, a move in backgammon is denoted as $4-2:\; 10/6\; 8/6$ where $4-2$ denotes that a four and two was thrown, $10/6$ denotes that a piece was moved from position 10 to 6 and $8/6$ denotes that a piece was moved from position 8 to 6. Such a message can be encoded as 10 bits, thus the total amount of information send between the players for an entire game is $10bits*15*2 = 300bits = 37.5B$. Thus the total amount of information send between the players for an entire game is $5.775kB + 37.5B = 5.8125kB$. This is by no means a lot of information, and the cost of distribution is quite low. 
