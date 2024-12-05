@@ -1,5 +1,5 @@
 import "../styles/GameHomePage.css";
-import { Stack, Button, Box } from "@mui/material";
+import { Stack, Button } from "@mui/material";
 import AppTheme from '../shared-theme/AppTheme';
 import { styled } from '@mui/material/styles';
 import MuiCard from '@mui/material/Card';
@@ -49,7 +49,7 @@ const Card = styled(MuiCard)(({ theme }) => ({
     },
   }));
 
-const ResultPage = () => {
+const ResultPage = (props) => {
     const navigate = useNavigate();
 
     const location = useLocation();
@@ -69,7 +69,7 @@ const ResultPage = () => {
                 <ColorModeSelect sx={{ position: 'fixed', top: '1rem', right: '1rem' }} />
                 <Card variant="outlined">
                     <h2>{text}</h2>
-                    <Button variant="outlined" sx={{width: "100%"}} onClick={handleHomeNavigation}>Log Out</Button>
+                    <Button variant="outlined" sx={{width: "100%"}} onClick={handleHomeNavigation}>Back To Home</Button>
                 </Card>
             </Container>
         </AppTheme>

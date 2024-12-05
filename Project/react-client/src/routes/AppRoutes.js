@@ -11,6 +11,7 @@ import NotFound from "../pages/NotFound";
 import StatsPage from "../pages/StatsPage";
 import { AuthProvider } from "../hooks/AuthProvider";
 import ProtectedRoute from "./ProtectedRoute";
+import ResultPage from "../pages/ResultPage";
 
 const AppRoutes = () => {
     return (
@@ -30,6 +31,7 @@ const AppRoutes = () => {
                         <Route path="lobby" element={<LobbyPage />} />
                         <Route path="match" element={<GamePage />} />
                         <Route path="stats" element={<StatsPage />} />
+                        <Route path="result" element={<ResultPage />} />
                     </Route>
                     <Route path="/" element={<HomePage />} />
                     <Route path="*" element={<NotFound />} />

@@ -18,8 +18,24 @@ function GetPlayerGames(){
     return GetPlayerStat("Game");
 }
 
+function SetPlayerGames(value){
+    SetPlayerStat("Game", value)
+}
+
 function GetPlayerWins(){
-    return GetPlayerStat("Game");
+    return GetPlayerStat("Win");
+}
+
+function SetPlayerWins(value){
+    SetPlayerStat("Win", value);
+}
+
+function IncreasePlayerGames(){
+    SetPlayerGames(GetPlayerGames() + 1);
+}
+
+function IncreasePlayerWins(){
+    SetPlayerWins(GetPlayerWins() + 1);
 }
 
 
@@ -36,6 +52,12 @@ function GetPlayerStat(statName){
     return value;
 }
 
+function SetPlayerStat(statName, newValue){
+    const statKey = GetPlayerName() + "-" + statName;
+
+    localStorage.setItem(statKey, newValue);
+}
+
 function GetToken(){
     return localStorage.getItem("Token");
 }
@@ -44,4 +66,4 @@ function SetToken(token){
     localStorage.setItem("Token",token);
 }
 
-export {GetPlayerName, SetPlayerName, GetPlayerGames, GetPlayerWins, GetPlayerStat, GetToken, SetToken};
+export {GetPlayerName, SetPlayerName, GetPlayerGames, GetPlayerWins, GetPlayerStat, GetToken, SetToken, IncreasePlayerGames, IncreasePlayerWins};

@@ -69,3 +69,21 @@
     height: 66px;
     background-color: gray;
 }
+
+.indicatorImage {
+    width: 30px;
+}
+
+h3 {
+    display: inline;
+}
+
+.activePlayer {
+    padding: 5px;
+    border-radius: 3px;
+    background-color: gray;
+}
+
+.passDiv {
+    margin-top: 10px;
+}

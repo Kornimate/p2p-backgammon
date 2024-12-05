@@ -5,7 +5,7 @@ import blackImage from '../assets/black_player.png';
 import whiteImage from '../assets/white_player.png';
 import "../styles/GameBoard.css";
 import GameBoardPieceHolder from './GameBoardPieceHolder.js';
-import { GetPlayerName } from '../shared-resources/StorageHandler.js';
+import { GetPlayerName, IncreasePlayerGames, IncreasePlayerWins } from '../shared-resources/StorageHandler.js';
 import Snackbar, { SnackbarCloseReason } from '@mui/material/Snackbar';
 import IconButton from '@mui/material/IconButton';
 import CloseIcon from '@mui/icons-material/Close';
@@ -37,6 +37,7 @@ const GameBoard = ({ write, listen, opponentName, isBlack}) => {
 
     const [firstMove, setFirstMove] = useState(!isBlack);
     const [isActive, setIsActive] = useState(false);
+    const [isBearingOff, setIsBearingOff] = useState(false);
     const [activeThrow, setActiveThrow] = useState(0);
 
     const handleClose = (_, reason) => {
@@ -58,10 +59,81 @@ const GameBoard = ({ write, listen, opponentName, isBlack}) => {
             return;
         }
 
+        if(knockedOutPieces[GetPositionInBoard()] > 0){
+            if(isBlack){
+                if(index !== 23){
+                    setOpen(true);
+                    return;
+                }
+
+                if(board[CalculatePositionInBoard(index, availableThrows[activeThrow])][GetOpponentPositionInBoard()] > 1){
+                    setOpen(true);
+                    return;
+                }
+            } else {
+                if(index !== 0){
+                    setOpen(true);
+                    return;
+                }
+
+                if(board[CalculatePositionInBoard(index, availableThrows[activeThrow])][GetOpponentPositionInBoard()] > 1){
+                    setOpen(true);
+                    return;
+                }
+            }
+
+            const tempBoard = [...board]
+            tempBoard[index][GetPositionInBoard()]++;
+            setBoard(tempBoard);
+
+            const tempKnocked = [...knockedOutPieces];
+            tempKnocked[GetPositionInBoard()]--;
+            setKnockedOutPieces(tempKnocked);
+
+            PostOpponentReEntry(index);
+        }
+
+        if(isBearingOff){
+
+            if(isBlack){
+                if(!IndexOnHomeBoardOfBlack(index)){
+                    setOpen(true);
+                    return;
+                }
+            } else {
+                if(!IndexOnHomeBoardOfWhite(index)){
+                    setOpen(true);
+                    return;
+                }
+            }
+
+            const tempBoard = [...board]
+            tempBoard[index][GetPositionInBoard()]--;
+            setBoard(tempBoard);
+
+            PostOpponentBearOff(index);
+            
+            return;
+        }
+
         const tempBoard = [...board]
-        tempBoard[index][GetPositionInBoard]--;
+        tempBoard[index][GetPositionInBoard()]--;
         tempBoard[CalculatePositionInBoard(index, availableThrows[activeThrow])][GetPositionInBoard()]++
+        if(tempBoard[CalculatePositionInBoard(index, availableThrows[activeThrow])][GetOpponentPositionInBoard()] === 1){
+            tempBoard[CalculatePositionInBoard(index, availableThrows[activeThrow])][GetOpponentPositionInBoard()] = 0;
+            const tempKnocked = [...knockedOutPieces];
+            tempKnocked[GetOpponentPositionInBoard()]++;
+            setKnockedOutPieces(tempKnocked);
+        }
         setBoard(tempBoard);
+
+        PostOpponentNewStep(index, temp[activeThrow]);
+
+        CheckIsGameEnded();
+
+        if(isBearingOff){
+
+        }
 
         const temp = [...availableThrows];
         temp[activeThrow] = -1;
@@ -71,8 +143,61 @@ const GameBoard = ({ write, listen, opponentName, isBlack}) => {
     }
 
     function IsMoveIllegal(index){
+        if(board[index][GetPositionInBoard()] === 0)
+            return true;
+
+        if(board[CalculatePositionInBoard(index, availableThrows[activeThrow])][GetOpponentPositionInBoard()] > 1)
+            return true;
+
         return false;
-        //TODO implement game rules
+    }
+
+    function CheckIsGameEnded(){
+        let sum = 0;
+
+        if(isBlack){
+            for(let i=18;i<24;i++){
+                sum += board[i][0];
+            }
+
+            if(sum >= 15){
+                setIsBearingOff(true);
+            }
+        } else {
+            for(let i=0;i<6;i++){
+                sum += board[i][1];
+            }
+
+            if(sum >= 15){
+                setIsBearingOff(true);
+            }
+        }
+
+        if(isBlack){
+            if(board.every((element) => element[0] === 0)){
+                IncreasePlayerGames();
+                IncreasePlayerWins();
+                navigate("/game/result?text=Win")
+                return;
+            }
+            if(board.every((element) => element[1] === 0)){
+                IncreasePlayerGames();
+                navigate("/game/result?text=Defeat")
+                return;
+            }
+        } else {
+            if(board.every((element) => element[1] === 0)){
+                IncreasePlayerGames();
+                IncreasePlayerWins();
+                navigate("/game/result?text=Win")
+                return;
+            }
+            if(board.every((element) => element[0] === 0)){
+                IncreasePlayerGames();
+                navigate("/game/result?text=Defeat")
+                return;
+            }
+        }
     }
 
     function BlackKnockedOutClicked(){
@@ -124,16 +249,63 @@ const GameBoard = ({ write, listen, opponentName, isBlack}) => {
         return isBlack ? 1 : 0;
     }
 
+    function SetOwnTimer(){
+        setTimer(setTimeout(() => {
+            PassHandlingToOther()
+        }, 120000));
+    }
+
+    function SetOpponentTimer(){
+        setTimer(setTimeout(() => {
+            EndMatchIfNotResponsive()
+        }, 150000));
+    }
+
     function PassHandlingToOther(){
+        if(!isActive){
+            setOpen(true);
+            return;
+        }
         setIsActive(false);
         SendData({
             type: "CONTROL",
             value: true
         })
 
-        setTimer(setTimeout(() => {
-            EndMatchIfNotResponsive()
-        }, 150000));
+        clearTimeout(timer);
+        SetOpponentTimer();
+    }
+
+    function PostOpponentNewStep(startIndex, stepSize){
+        SendData({
+            type: "STEP",
+            value: {
+                index: startIndex,
+                step: stepSize
+            }
+        })
+    }
+
+    function PostOpponentBearOff(index){
+        SendData({
+            type: "BEAROFF",
+            value: index
+        })
+    }
+
+    function PostOpponentReEntry(index){
+        SendData({
+            type:"REENTRY",
+            value: index
+        })
+    }
+
+    function IndexOnHomeBoardOfBlack(index){
+        return index < 24 && index > 17;
+    }
+  
+    function IndexOnHomeBoardOfWhite(index){
+        return index >= 0 && index < 6;
     }
 
     function EndMatchIfNotResponsive(){
@@ -146,9 +318,7 @@ const GameBoard = ({ write, listen, opponentName, isBlack}) => {
     function GetDiceRolls(){
         setAvailableThrows([Math.floor(Math.random() * 6) + 1, Math.floor(Math.random() * 6) + 1])
         setActiveThrow(0);
-        setTimer(setTimeout(() => {
-            PassHandlingToOther()
-        }, 120000));
+        SetOwnTimer();
     }
 
     useEffect(() => {
@@ -161,14 +331,49 @@ const GameBoard = ({ write, listen, opponentName, isBlack}) => {
         if(firstMove === true){
             setFirstMove(false);
             setIsActive(true);
+            return;
         }
+
+        setIsActive(false);
+        SetOpponentTimer();
     }, [])
 
     useEffect(() => {
         if(!incomingMessage)
             return;
 
-        ///handle messages
+        if(incomingMessage.type === "CONTROL"){
+            clearInterval(timer);
+            setIsActive(true);
+            return;
+        }
+
+        if(incomingMessage.type === "STEP"){
+            const tempBoard = [...board]
+            tempBoard[incomingMessage.value.index][GetOpponentPositionInBoard()]--;
+            tempBoard[CalculateOpponentPositionInBoard(incomingMessage.value.index, incomingMessage.value.step)][GetOpponentPositionInBoard()]++
+            if(tempBoard[CalculateOpponentPositionInBoard(incomingMessage.value.index, incomingMessage.value.step)][GetPositionInBoard()] === 1){
+                tempBoard[CalculateOpponentPositionInBoard(incomingMessage.value.index, incomingMessage.value.step)][GetPositionInBoard()] = 0;
+                const tempKnocked = [...knockedOutPieces];
+                tempKnocked[GetPositionInBoard()]++;
+                setKnockedOutPieces(tempKnocked);
+            }
+            setBoard(tempBoard);
+        }
+
+        if(incomingMessage.type === "BEAROFF"){
+            const tempBoard = [...board]
+            tempBoard[incomingMessage.value][GetOpponentPositionInBoard()]--;
+            setBoard(tempBoard);
+            return;
+        }
+
+        if(incomingMessage.type === "REENTRY"){
+            const tempKnocked = [...knockedOutPieces];
+            tempKnocked[GetOpponentPositionInBoard()]--;
+            setKnockedOutPieces(tempKnocked);
+            return;
+        }
 
     }, [incomingMessage])
 
@@ -183,21 +388,17 @@ const GameBoard = ({ write, listen, opponentName, isBlack}) => {
         if(!availableThrows.every((element) => element < 0))
             return;
 
-        clearTimeout(timer);
-        PassHandlingToOther()
+        PassHandlingToOther();
     }, [availableThrows]);
 
     const action = (
         <Fragment>
-          <Button color="secondary" size="small" onClick={handleClose}>
-            UNDO
-          </Button>
           <IconButton
             size="small"
             aria-label="close"
             color="inherit"
             onClick={handleClose}
-          >
+            >
             <CloseIcon fontSize="small" />
           </IconButton>
         </Fragment>
@@ -206,7 +407,12 @@ const GameBoard = ({ write, listen, opponentName, isBlack}) => {
     return (
         <>
             <div className="container">
-                <h3>{GetPlayerName()} VS {opponentName}</h3>
+                <div>
+                    <h3 className={isActive ? "activePlayer" : ""}>{GetPlayerName()}</h3> VS <h3 className={!isActive ? "activePlayer" : ""}>{opponentName}</h3>
+                </div>
+                <div>
+                    <img src={isBlack ? blackImage : whiteImage } className="indicatorImage"/>
+                </div>
                 <div className="buttonsDiv">
                     {
                         buttons13To24.map((identifier) => (
@@ -263,6 +469,9 @@ const GameBoard = ({ write, listen, opponentName, isBlack}) => {
                     <div className={activeThrow === 1 ? "ActiveDiceDiv": "DiceDiv"}>
                         <div onClick={() => ManageActiveThrow(1)}>{availableThrows[1]}</div>
                     </div>
+                </div>
+                <div className="passDiv">
+                    <Button variant='outlined' onClick={() => PassHandlingToOther()}>Pass</Button>
                 </div>
             </div>
             <div>
