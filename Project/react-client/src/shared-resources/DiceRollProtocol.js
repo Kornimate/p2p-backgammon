@@ -1,91 +1,61 @@
-import Peer from 'peerjs';
 import crypto from 'crypto';
 
-let hash = null;
-let randomNum = null;
-let nonce = null;
-let opponentHash = null;
-let opponentRandomNum = null;
-let diceResult = null;
-let peer = null;
-let connection = null;
-let peerId = '';
+class DiceProtocol {
+    constructor() {
+        this.hash = null;
+        this.randomNum = null;
+        this.nonce = null;
+        this.opponentHash = null;
+        this.opponentRandomNum = null;
+        this.diceResult = null;
+    }
 
-export const initializePeer = () => {
-    return new Promise((resolve, reject) => {
-        peer = new Peer();
-        peer.on('open', (id) => {
-            peerId = id;
-            resolve(peerId);
-        });
-        peer.on('connection', (conn) => {
-            connection = conn;
-            connection.on('data', handleData);
-        });
-        peer.on('error', reject);
-    });
-};
+    startProtocol() {
+        this.randomNum = Math.floor(Math.random() * 6); // uniformly random
+        this.nonce = crypto.randomBytes(16).toString('hex');
+        this.hash = crypto.createHash('sha256').update(this.randomNum + this.nonce).digest('hex');
 
-export const connectToPeer = (opponentId) => {
-    return new Promise((resolve, reject) => {
-        if (!peer) {
-            reject(new Error('Peer not initialized.'));
-            return;
+        return { randomNum: this.randomNum, nonce: this.nonce, hash: this.hash };
+    }
+
+    revealSecret() {
+        if (this.hash && this.opponentHash) {
+            this.connection.send({
+                type: 'reveal',
+                randomNum: this.randomNum.toString(),
+                nonce: this.nonce,
+            }); //no good like this
+        }
+    }
+
+    handleData(data) {
+        if (data.type === 'hash') {
+            this.opponentHash = data.hash;
+        } else if (data.type === 'reveal') {
+            this.opponentRandomNum = {
+                randomNum: data.randomNum,
+                nonce: data.nonce,
+            };
+        }
+    }
+
+    verifyAndRollDice() {
+        if (!this.opponentHash || !this.opponentRandomNum) {
+            throw new Error('Missing Data');
         }
 
-        connection = peer.connect(opponentId);
-        connection.on('open', () => {
-            connection.on('data', handleData);
-            resolve();
-        });
-        connection.on('error', reject);
-    });
-};
+        const { randomNum: opponentRandomNum, nonce: opponentNonce } = this.opponentRandomNum;
+        const verifyHash = crypto.createHash('sha256')
+            .update(opponentRandomNum + opponentNonce)
+            .digest('hex');
 
-export const startProtocol = () => {
-    randomNum = Math.floor(Math.random() * 6); //uniformly random
-    nonce = crypto.randomBytes(16).toString('hex');
-    hash = crypto.createHash('sha256').update(randomNum + nonce).digest('hex');
+        if (verifyHash !== this.opponentHash) {
+            throw new Error('Potential cheating detected');
+        }
 
-    if(connection) {
-        connection.send({type: 'hash', hash: hash});
+        this.diceResult = ((this.randomNum + parseInt(opponentRandomNum)) % 6) + 1;
+        return { diceResult: this.diceResult };
     }
-
-    return { randomNum, nonce, hash };
-};
-
-export const revealSecret = () => {
-    if(hash && opponentHash && connection) {
-        connection.send({
-            type: 'reveal',
-            randomNum: randomNum.toString(),
-            nonce: nonce
-        });
-    }
-};
-
-export const handleData = (data) => {
-    if(data.type === 'hash') {
-        opponentHash = data.hash;
-    }
-    else if(data.type === 'reveal') {
-        opponentRandomNum = {
-            randomNum: data.randomNum, 
-            nonce: data.nonce
-        };
-    }
-};
-
-export const verifyAndRollDice = () => {
-    if (!opponentHash || !opponentRandomNum) {
-        throw new Error('Missing Data');
-    }
-    const { randomNum: opponentRandomNum, nonce: opponentNonce } = opponentRandomNum;
-    const verifyHash = crypto.createHash('sha256').update(opponentRandomNum + opponentNonce).digest('hex');
-
-    if(verifyHash !== opponentHash) {
-        throw new Error('Potential cheating detected');
-    }
-    diceResult = ((randomNum + opponentRandomNum) % 6) + 1;
-    return {diceResult};
 }
+
+export default DiceProtocol;

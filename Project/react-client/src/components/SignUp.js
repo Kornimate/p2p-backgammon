@@ -132,7 +132,7 @@ export default function SignUp(props) {
       navigate('/game');
     }
     catch{
-      console.log("failed registration");
+      alert("Error while signing up!")
     }
   };
 

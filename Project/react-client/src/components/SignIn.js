@@ -82,6 +82,9 @@ export default function SignIn(props) {
       password: "Admin!1234",
     };
 
+    // email: data.get('email'),
+    // password: data.get('password'),
+
     try{
       const response = await axios.post("http://localhost:8080/api/auth/login", postData);
       SetToken(response.data.token);
@@ -91,7 +94,7 @@ export default function SignIn(props) {
       navigate('/game');
     }
     catch{
-      console.log("invalid credentials");
+      alert("Error while signing in!")
     }
   };
 
