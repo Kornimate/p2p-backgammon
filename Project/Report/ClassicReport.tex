@@ -63,6 +63,15 @@
 
 \chapter{Introduction}
 \label{cha:introduction}
+Backgammon is one of the oldest games - and yet still very popular until this day. The oldest record of Backgammon with the rules as we know and play them nowadays, reaches back to the 17th century. 
+The game combines elements of skill and luck, which make each round unique. Although the rules are fairly easy to learn, the players are required to engage in careful decision making and strategic planning.
+The inherent complexity of the game and high skill ceiling are perfect conditions for competitions and tournaments and allow each player to grow and refine their skill. \\
+In this project we attempt to build Backgammon ourselves, while appying the knowledge we gained from the lecture. \\
+Players are going to connect to a server and further communicate directly with each other as peers. %need reference to section
+Through a matchmaking system, the players will be able to queue up and get matched against each other according to their skill level. 
+At the end of each game the skill level of the players will get updated, thus ensuring fair games.\\
+Throughout this report we are going to talk about the design choices and technical implementation, as well as the challenges we encountered and further improvements that can be made. 
+% should we mention here already that we didnt implement everything?
 
 
 \chapter{Architecture \& Implementation}
@@ -116,6 +125,15 @@ The game board is implemented using the GameBoard component which uses various c
 \section{Networking}
 There are two types of networking used in this project, the first is the server that the players has to connect to in order to get matched with another player, this happens automatically when a player logs in to the home page of the game. Once the player has logged the server til be aware of the player and will later match the player with another player. The server is a rather simple as it does not have much work to do, it primary role is handle user authentication and then match players. The server is written in C\# and uses ASP.NET as the framework for setting up the server. At the moment the server is running as localhost and is not visible to any devises outside the local network, if we were to launch this program as a real world application it would of cause be hosted on a server appropriate for the task. The second connection is the peer-to-peer connected established between two players once they are connected by the server. As briefly mentioned in the general architecture section, once the connection between the two players are established they disconnects from the server, as it is no longer needed. 
 Given that we want to use the server as little as possible, the statistics of the players are stored in the browser, as we will cover in section \ref{sec:security} this poses a minor security risk. There is also the possibility of a player clearing their browser cache and thus losing their statistics, this problem could be solved in many ways, one way could be to store the statistics in a central database much like the users information is sotred in one, we would however perfer to use the server as little as possible, so this is not really an option for us. Another probability is using a peer-to-peer database, thus ensuring that we continue using a mainly peer-to-peer distributed system. It would even be possible to use a blockchain to store the statistics, it might be a bit overkill for our purpose, but it is a possibility. As mentioned earlier we simply store the statistics in the browser, and thus none of the mentioned solutions are implemented, we are however aware of the problem and have thought about possible solutions.
+
+\subsection{Sign Up}
+Users can sign up and create an account, to play the game and save their statistics for better matchmaking and fair games. 
+To sign up, the user can create a username and password. Additionally, an email address is required to verify the account.
+
+\subsection{Login}
+With an email address and password, a player can log in and is now able to queue up against other players. If the user forgot his password, the password can be reset through the email address that the user has provided during the sign up. \\
+For testing purposes we created a default user with the credentials ``admin@test.com'' as email address and ``Admin!1234'' as password.
+% tokens 
 
 \section{Player Matching}
 We have talked some about the matching of players, but not exactly how it works. The goal of the player matching is for the match to be as fair as possible, it would be no fun for either of the players to get matched with one from a different leage. The players are put into one of 6 ggroupes based on the number of wins and if possible the players are matched with someone from their own group. However when there are few players, or even many, it might be the case that there is two player from two different groups where they are the player in that group, in such a case we match those players even though the game might no be fair for the player, but  at least they get to play. One way to make the game more fair is to allow the player with the least skill to remove some of his pieces, thus allowing that player a headstart. The amount of pieces to remove has to be determined either by some standard rule or in collaboration with an expert, as we are not qualified.
