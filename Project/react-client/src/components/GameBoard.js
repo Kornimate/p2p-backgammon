@@ -127,7 +127,7 @@ const GameBoard = ({ write, listen, opponentName, isBlack}) => {
         }
         setBoard(tempBoard);
 
-        PostOpponentNewStep(index, temp[activeThrow]);
+        PostOpponentNewStep(index, availableThrows[activeThrow]);
 
         CheckIsGameEnded();
 
@@ -251,7 +251,9 @@ const GameBoard = ({ write, listen, opponentName, isBlack}) => {
 
     function SetOwnTimer(){
         setTimer(setTimeout(() => {
-            PassHandlingToOther()
+            if(isActive){
+                PassHandlingToOther()
+            }
         }, 120000));
     }
 
@@ -272,7 +274,6 @@ const GameBoard = ({ write, listen, opponentName, isBlack}) => {
             value: true
         })
 
-        clearTimeout(timer);
         SetOpponentTimer();
     }
 
@@ -343,7 +344,7 @@ const GameBoard = ({ write, listen, opponentName, isBlack}) => {
             return;
 
         if(incomingMessage.type === "CONTROL"){
-            clearInterval(timer);
+            clearTimeout(timer);
             setIsActive(true);
             return;
         }
