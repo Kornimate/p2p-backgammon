@@ -64,6 +64,11 @@ namespace ASP_Server.Controllers
             if (user is not null)
                 return BadRequest();
 
+            user = await userManager.FindByNameAsync(model.UserName);
+
+            if (user is not null)
+                return BadRequest();
+
             var res = await userManager.CreateAsync(new IdentityUser
             {
                 UserName = model.UserName,
