@@ -17,6 +17,7 @@ import three from "../assets/three.png"
 import four from "../assets/four.png"
 import five from "../assets/five.png"
 import six from "../assets/six.png"
+import DiceProtocol from '../shared-resources/DiceRollProtocol.js';
 
 const GameBoard = ({ write, listen, opponentName, isBlack}) => {
     
@@ -56,6 +57,10 @@ const GameBoard = ({ write, listen, opponentName, isBlack}) => {
     const [isActive, setIsActive] = useState(false);
     const [isBearingOff, setIsBearingOff] = useState(false);
     const [activeThrow, setActiveThrow] = useState(0);
+
+    const [calculatedDice, setCalculatedDice] = useState(0);
+    const [calculatedDices, setCalculatedDices] = useState([0, 0]);
+    const [diceCalculator, setDiceCalculator] = useState(new DiceProtocol());
 
     const handleClose = (_, reason) => {
         if (reason === 'clickaway') {
@@ -375,9 +380,25 @@ const GameBoard = ({ write, listen, opponentName, isBlack}) => {
     }
 
     function GetDiceRolls(){
-        setAvailableThrows([Math.floor(Math.random() * 6) + 1, Math.floor(Math.random() * 6) + 1])
+        StartDiceRoll();
         setActiveThrow(0);
         SetOwnTimer();
+    }
+
+    function StartDiceRoll(){
+        diceCalculator.clear();
+        setAvailableThrows([0, 0]);
+        setCalculatedDices([0, 0]);
+        setCalculatedDice(0);
+
+        SendFirstHash();
+    }
+
+    function SendFirstHash(){
+        SendData({
+            type:"HASH",
+            value: diceCalculator.startProtocol()
+        });
     }
 
     function GetDiceImgForPosition(pos){
@@ -411,6 +432,50 @@ const GameBoard = ({ write, listen, opponentName, isBlack}) => {
     useEffect(() => {
         if(!incomingMessage)
             return;
+
+        if(incomingMessage.type === "HASH"){
+            diceCalculator.setOpponentHash(incomingMessage.value);
+            SendData({
+                type: "HASHRESPONSE",
+                value: diceCalculator.startProtocol()
+            });
+            return;
+        }
+
+        if(incomingMessage.type === "HASHRESPONSE"){
+            diceCalculator.setOpponentHash(incomingMessage.value);
+            SendData({
+                type: "HASHREVEAL",
+                value: diceCalculator.getNonceAndRandomNum()
+            });
+            return;
+        }
+
+        if(incomingMessage.type === "HASHREVEAL"){
+            diceCalculator.setOpponentNonceAndRandomNum(incomingMessage.value);
+            SendData({
+                type: "HASHREVEALRESPONSE",
+                value: diceCalculator.getNonceAndRandomNum()
+            });
+            return;
+        }
+
+        if(incomingMessage.type === "HASHREVEALRESPONSE"){
+            diceCalculator.setOpponentNonceAndRandomNum(incomingMessage.value);
+
+            try{
+                const tempDiceRolls = [...calculatedDices];
+                tempDiceRolls[calculatedDice] = diceCalculator.verifyAndRollDice();
+                setCalculatedDices(tempDiceRolls);
+                setCalculatedDice((prev) => prev + 1);
+            } catch {
+                alert("possible cheating detected, disconnecting");
+                write.close();
+                listen.close();
+                navigate("/game");
+            }
+            return;
+        }
 
         if(incomingMessage.type === "CONTROL"){
             setIsActive(true);
@@ -480,8 +545,18 @@ const GameBoard = ({ write, listen, opponentName, isBlack}) => {
     }, [availableThrows]);
 
     useEffect(() => {
+        if(calculatedDice === 1){
+            SendFirstHash()
+        }
+    }, [calculatedDice])
+
+    useEffect(() => {
         //Nothing to do, just force update
     }, [opponentTimer, selfTimer])
+
+    useEffect(() => {
+        //Nothing to do, just force update
+    }, [calculatedDices, diceCalculator])
 
     useEffect(() => {
         CheckIsGameEnded();

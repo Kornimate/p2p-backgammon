@@ -20,7 +20,7 @@ namespace ASP_Server
 
             builder.Services.AddDbContext<ServerDbContext>(options =>
             {
-                options.UseSqlServer(builder.Configuration.GetConnectionString("SQLDEVCONNECTION"));
+                options.UseSqlite(builder.Configuration.GetConnectionString("SQLITECONNECTION"));
                 options.UseLazyLoadingProxies();
             });
 
