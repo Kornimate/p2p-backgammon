@@ -52,6 +52,24 @@ const GamePage = () => {
     }, []);
 
     useEffect(() => {
+        const handleBeforeUnload = (event) => {
+          event.preventDefault();
+
+            if(connectionSignalR){
+                connectionSignalR.stop();
+            }
+
+          event.returnValue = "";
+        };
+    
+        window.addEventListener("beforeunload", handleBeforeUnload);
+    
+        return () => {
+          window.removeEventListener("beforeunload", handleBeforeUnload);
+        };
+      }, []);
+
+    useEffect(() => {
 
         if(!peerId)
             return;

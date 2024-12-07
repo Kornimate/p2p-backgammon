@@ -36,6 +36,13 @@ const GameBoard = ({ write, listen, opponentName, isBlack}) => {
         [5, 0], [0, 0], [0, 0], [0, 0], [0, 0], [0, 2]    // (19 - 24)
     ]);
 
+    // const [board, setBoard] = useState([ //for testing bearoff and game end
+    //     [0, 3], [0, 3], [0, 3], [0, 3], [0, 2], [0, 1],   // (1 - 6) // black and white
+    //     [0, 0], [0, 0], [0, 0], [0, 0], [0, 0], [0, 0],   // (7 - 12)
+    //     [0, 0], [0, 0], [0, 0], [0, 0], [0, 0], [0, 0],   // (13 - 18)
+    //     [3, 0], [3, 0], [3, 0], [3, 0], [2, 0], [1, 0]    // (19 - 24)
+    // ]);
+
     const [buttons1To12] = useState([...Array(12).keys()].map(i => 11-i));
     const [buttons13To24] = useState([...Array(12).keys()].map(i => (12 + i)));
 
@@ -249,6 +256,18 @@ const GameBoard = ({ write, listen, opponentName, isBlack}) => {
         setIncomingMessage({...msg})
     }
 
+    function NullTimers(){
+        if(selfTimer !== null){
+            clearTimeout(selfTimer);
+            setSelfTimer(null);
+        }
+
+        if(opponentTimer !== null){
+            clearTimeout(opponentTimer);
+            setOpponentTimer(null);
+        }
+    }
+
     function ManageActiveThrow(num){
         if(!isActive)
             return;
@@ -388,6 +407,23 @@ const GameBoard = ({ write, listen, opponentName, isBlack}) => {
         setIsActive(false);
         SetOpponentTimer();
     }, [])
+
+    useEffect(() => {
+        const handleBeforeUnload = (event) => {
+          event.preventDefault();
+
+          listen.close();
+          write.close();
+
+          event.returnValue = "";
+        };
+    
+        window.addEventListener("beforeunload", handleBeforeUnload);
+    
+        return () => {
+          window.removeEventListener("beforeunload", handleBeforeUnload);
+        };
+      }, []);
 
     useEffect(() => {
         if(!incomingMessage)
