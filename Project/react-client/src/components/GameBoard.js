@@ -469,6 +469,7 @@ const GameBoard = ({ write, listen, opponentName, isBlack}) => {
                 setCalculatedDices(tempDiceRolls);
                 setCalculatedDice((prev) => prev + 1);
             } catch {
+                console.log(diceCalculator)
                 alert("possible cheating detected, disconnecting");
                 write.close();
                 listen.close();
@@ -547,6 +548,9 @@ const GameBoard = ({ write, listen, opponentName, isBlack}) => {
     useEffect(() => {
         if(calculatedDice === 1){
             SendFirstHash()
+        }
+        if(calculatedDice === 2){
+            setAvailableThrows([...calculatedDices])
         }
     }, [calculatedDice])
 

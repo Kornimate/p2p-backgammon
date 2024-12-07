@@ -1,4 +1,4 @@
-import crypto from 'crypto-browserify';
+import CryptoJS from 'crypto-js';
 
 class DiceProtocol {
     constructor() {
@@ -26,9 +26,9 @@ class DiceProtocol {
     }
 
     startProtocol() {
-        this.randomNum = Math.floor(Math.random() * 6); // uniformly random
-        this.nonce = crypto.randomBytes(16).toString('hex');
-        this.hash = crypto.createHash('sha256').update(this.randomNum + this.nonce).digest('hex');
+        this.randomNum = Math.floor(Math.random() * 6) + 1; // uniformly random
+        this.nonce = CryptoJS.lib.WordArray.random(16).toString(CryptoJS.enc.Hex);
+        this.hash = CryptoJS.SHA256(this.randomNum + this.nonce).toString(CryptoJS.enc.Hex);
 
         return this.hash;
     }
@@ -39,9 +39,7 @@ class DiceProtocol {
             throw new Error('Missing Data');
         }
 
-        const verifyHash = crypto.createHash('sha256')
-            .update(this.opponentRandomNum + this.opponentNonce)
-            .digest('hex');
+        const verifyHash = CryptoJS.SHA256(this.opponentRandomNum + this.opponentNonce).toString(CryptoJS.enc.Hex);
 
         if (verifyHash !== this.opponentHash) {
             console.error("Potential cheating detected")

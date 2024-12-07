@@ -80,10 +80,10 @@ export default function SignIn(props) {
     const data = new FormData(event.currentTarget);
 
     const postData = {
-      email: data.get('email'),
-      password: data.get('password')
-      // email: "admin@test.com", //for fast auth
-      // password: "Admin!1234"
+      // email: data.get('email'),
+      // password: data.get('password')
+      email: "admin@test.com", //for fast auth
+      password: "Admin!1234"
     };
     
 
@@ -104,7 +104,7 @@ export default function SignIn(props) {
     const email = document.getElementById('email');
     const password = document.getElementById('password');
 
-    // return true; // for fast auth
+    return true; // for fast auth
 
     let isValid = true;
 
