@@ -1,5 +1,5 @@
 function GetPlayerName(){
-    let name = localStorage.getItem("playerName");
+    let name = sessionStorage.getItem("playerName");
     
     if(!name){
         const randomness = 100000000;
@@ -11,7 +11,7 @@ function GetPlayerName(){
 }
 
 function SetPlayerName(name){
-    localStorage.setItem("playerName", name);
+    sessionStorage.setItem("playerName", name);
 }
 
 function GetPlayerGames(){
