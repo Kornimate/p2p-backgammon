@@ -6,16 +6,24 @@ import whiteImage from '../assets/white_player.png';
 import "../styles/GameBoard.css";
 import GameBoardPieceHolder from './GameBoardPieceHolder.js';
 import { GetPlayerName, IncreasePlayerGames, IncreasePlayerWins } from '../shared-resources/StorageHandler.js';
-import Snackbar, { SnackbarCloseReason } from '@mui/material/Snackbar';
+import Snackbar from '@mui/material/Snackbar';
 import IconButton from '@mui/material/IconButton';
 import CloseIcon from '@mui/icons-material/Close';
 import { useNavigate } from 'react-router-dom';
+import nodice from "../assets/nodice.png"
+import one from "../assets/one.png"
+import two from "../assets/two.png"
+import three from "../assets/three.png"
+import four from "../assets/four.png"
+import five from "../assets/five.png"
+import six from "../assets/six.png"
 
 const GameBoard = ({ write, listen, opponentName, isBlack}) => {
     
     const[incomingMessage, setIncomingMessage] = useState(null);
     const [open, setOpen] = useState(false);
-    const [timer, setTimer] = useState(null);
+    const [selfTimer, setSelfTimer] = useState(null);
+    const [opponentTimer, setOpponentTimer] = useState(null);
 
     const navigate = useNavigate();
 
@@ -31,9 +39,11 @@ const GameBoard = ({ write, listen, opponentName, isBlack}) => {
     const [buttons1To12] = useState([...Array(12).keys()].map(i => 11-i));
     const [buttons13To24] = useState([...Array(12).keys()].map(i => (12 + i)));
 
-    const [knockedOutPieces, setKnockedOutPieces] = useState([0,0]); // black and white 
-    const [bearedOffPieces, setbearedOffPieces] = useState([0,0]); // black and white 
+    const [knockedOutPieces, setKnockedOutPieces] = useState([0, 0]); // black and white 
     const [availableThrows, setAvailableThrows] = useState([0, 0]); // black and white 
+
+    const [dice1Img, setDice1Img] = useState(nodice);
+    const [dice2Img, setDice2Img] = useState(nodice);
 
     const [firstMove, setFirstMove] = useState(!isBlack);
     const [isActive, setIsActive] = useState(false);
@@ -53,44 +63,49 @@ const GameBoard = ({ write, listen, opponentName, isBlack}) => {
             setOpen(true);
             return;
         }
-
-        if(IsMoveIllegal(index)){
-            setOpen(true);
-            return;
-        }
-
+        
         if(knockedOutPieces[GetPositionInBoard()] > 0){
             if(isBlack){
-                if(index !== 23){
-                    setOpen(true);
-                    return;
-                }
-
-                if(board[CalculatePositionInBoard(index, availableThrows[activeThrow])][GetOpponentPositionInBoard()] > 1){
-                    setOpen(true);
-                    return;
-                }
-            } else {
                 if(index !== 0){
                     setOpen(true);
                     return;
                 }
 
-                if(board[CalculatePositionInBoard(index, availableThrows[activeThrow])][GetOpponentPositionInBoard()] > 1){
+                if(board[CalculatePositionInBoard(index, availableThrows[activeThrow] - 1)][GetOpponentPositionInBoard()] > 1){
+                    setOpen(true);
+                    return;
+                }
+            } else {
+                if(index !== 23){
+                    setOpen(true);
+                    return;
+                }
+
+                if(board[CalculatePositionInBoard(index, availableThrows[activeThrow] - 1)][GetOpponentPositionInBoard()] > 1){
                     setOpen(true);
                     return;
                 }
             }
 
             const tempBoard = [...board]
-            tempBoard[index][GetPositionInBoard()]++;
-            setBoard(tempBoard);
-
             const tempKnocked = [...knockedOutPieces];
+
+            tempBoard[CalculatePositionInBoard(index, availableThrows[activeThrow] - 1)][GetPositionInBoard()]++;
             tempKnocked[GetPositionInBoard()]--;
+
+            if(tempBoard[CalculatePositionInBoard(index, availableThrows[activeThrow] - 1)][GetOpponentPositionInBoard()] === 1){
+                tempBoard[CalculatePositionInBoard(index, availableThrows[activeThrow] - 1)][GetOpponentPositionInBoard()]--;
+                tempKnocked[GetOpponentPositionInBoard()]++;
+            }
+            
+            setBoard(tempBoard);
             setKnockedOutPieces(tempKnocked);
 
-            PostOpponentReEntry(index);
+            PostOpponentReEntry(CalculatePositionInBoard(index, availableThrows[activeThrow]-1));
+
+            DecreaseAvailableThrows();
+
+            return;
         }
 
         if(isBearingOff){
@@ -100,8 +115,18 @@ const GameBoard = ({ write, listen, opponentName, isBlack}) => {
                     setOpen(true);
                     return;
                 }
+
+                if(index !== 24-availableThrows[activeThrow]){
+                    setOpen(true);
+                    return;
+                }
             } else {
                 if(!IndexOnHomeBoardOfWhite(index)){
+                    setOpen(true);
+                    return;
+                }
+
+                if(index !== (-1)+availableThrows[activeThrow]){
                     setOpen(true);
                     return;
                 }
@@ -112,7 +137,14 @@ const GameBoard = ({ write, listen, opponentName, isBlack}) => {
             setBoard(tempBoard);
 
             PostOpponentBearOff(index);
+
+            DecreaseAvailableThrows();
             
+            return;
+        }
+
+        if(IsMoveIllegal(index)){
+            setOpen(true);
             return;
         }
 
@@ -131,10 +163,10 @@ const GameBoard = ({ write, listen, opponentName, isBlack}) => {
 
         CheckIsGameEnded();
 
-        if(isBearingOff){
+        DecreaseAvailableThrows();
+    }
 
-        }
-
+    function DecreaseAvailableThrows(){
         const temp = [...availableThrows];
         temp[activeThrow] = -1;
         setAvailableThrows(temp);
@@ -143,10 +175,16 @@ const GameBoard = ({ write, listen, opponentName, isBlack}) => {
     }
 
     function IsMoveIllegal(index){
+
+        const newPos = CalculatePositionInBoard(index, availableThrows[activeThrow]); 
+
+        if(newPos > 23 || newPos < 0)
+            return true;
+
         if(board[index][GetPositionInBoard()] === 0)
             return true;
 
-        if(board[CalculatePositionInBoard(index, availableThrows[activeThrow])][GetOpponentPositionInBoard()] > 1)
+        if(board[newPos][GetOpponentPositionInBoard()] > 1)
             return true;
 
         return false;
@@ -200,18 +238,6 @@ const GameBoard = ({ write, listen, opponentName, isBlack}) => {
         }
     }
 
-    function BlackKnockedOutClicked(){
-        const temp = knockedOutPieces;
-        temp[0]++;
-        setKnockedOutPieces([...temp])
-    }
-
-    function WhiteKnockedOutClicked(){
-        const temp = knockedOutPieces;
-        temp[1]++;
-        setKnockedOutPieces([...temp])
-    }
-
     function SendData(data){
         write.send(JSON.stringify(data))
     }
@@ -238,11 +264,11 @@ const GameBoard = ({ write, listen, opponentName, isBlack}) => {
     }
 
     function CalculatePositionInBoard(index, offset){
-        return isBlack? index - offset : index + offset;
+        return isBlack? index + offset : index - offset;
     }
 
     function CalculateOpponentPositionInBoard(index, offset){
-        return isBlack? index + offset : index - offset;
+        return isBlack? index - offset : index + offset;
     }
 
     function GetOpponentPositionInBoard(){
@@ -250,17 +276,27 @@ const GameBoard = ({ write, listen, opponentName, isBlack}) => {
     }
 
     function SetOwnTimer(){
-        setTimer(setTimeout(() => {
+        if(opponentTimer != null){
+            clearTimeout(opponentTimer);
+            setOpponentTimer(null);
+        }
+
+        setSelfTimer(setTimeout(() => {
             if(isActive){
                 PassHandlingToOther()
             }
-        }, 120000));
+        }, 12000));
     }
 
     function SetOpponentTimer(){
-        setTimer(setTimeout(() => {
+        if(selfTimer != null){
+            clearTimeout(selfTimer);
+            setSelfTimer(null);
+        }
+
+        setOpponentTimer(setTimeout(() => {
             EndMatchIfNotResponsive()
-        }, 150000));
+        }, 30000));
     }
 
     function PassHandlingToOther(){
@@ -269,6 +305,7 @@ const GameBoard = ({ write, listen, opponentName, isBlack}) => {
             return;
         }
         setIsActive(false);
+        setAvailableThrows([0, 0]);
         SendData({
             type: "CONTROL",
             value: true
@@ -322,6 +359,17 @@ const GameBoard = ({ write, listen, opponentName, isBlack}) => {
         SetOwnTimer();
     }
 
+    function GetDiceImgForPosition(pos){
+        if(availableThrows[pos] < 1) return nodice;
+        if(availableThrows[pos] === 1) return one;
+        if(availableThrows[pos] === 2) return two;
+        if(availableThrows[pos] === 3) return three;
+        if(availableThrows[pos] === 4) return four;
+        if(availableThrows[pos] === 5) return five;
+        if(availableThrows[pos] === 6) return six;
+        if(availableThrows[pos] > 6) return nodice;
+    }
+
     useEffect(() => {
         listen.on("data", (data) => {
             HandleIncomingData(data);
@@ -344,7 +392,6 @@ const GameBoard = ({ write, listen, opponentName, isBlack}) => {
             return;
 
         if(incomingMessage.type === "CONTROL"){
-            clearTimeout(timer);
             setIsActive(true);
             return;
         }
@@ -360,6 +407,7 @@ const GameBoard = ({ write, listen, opponentName, isBlack}) => {
                 setKnockedOutPieces(tempKnocked);
             }
             setBoard(tempBoard);
+            return;
         }
 
         if(incomingMessage.type === "BEAROFF"){
@@ -370,9 +418,20 @@ const GameBoard = ({ write, listen, opponentName, isBlack}) => {
         }
 
         if(incomingMessage.type === "REENTRY"){
+            const tempBoard = [...board]
             const tempKnocked = [...knockedOutPieces];
+
+            tempBoard[incomingMessage.value][GetOpponentPositionInBoard()]++;
             tempKnocked[GetOpponentPositionInBoard()]--;
+
+            if(tempBoard[incomingMessage.value][GetPositionInBoard()] === 1){
+                tempBoard[incomingMessage.value][GetPositionInBoard()]--;
+                tempKnocked[GetPositionInBoard()]++;
+            }
+            
+            setBoard(tempBoard);
             setKnockedOutPieces(tempKnocked);
+
             return;
         }
 
@@ -391,6 +450,17 @@ const GameBoard = ({ write, listen, opponentName, isBlack}) => {
 
         PassHandlingToOther();
     }, [availableThrows]);
+
+    useEffect(() => {
+
+        setDice1Img(GetDiceImgForPosition(0));
+        setDice2Img(GetDiceImgForPosition(1));
+
+    }, [availableThrows]);
+
+    useEffect(() => {
+        //Nothing to do, just force update
+    }, [opponentTimer, selfTimer])
 
     const action = (
         <Fragment>
@@ -455,24 +525,24 @@ const GameBoard = ({ write, listen, opponentName, isBlack}) => {
                 </div>
                 <div className="knockedOutPiecesDivHolder">
                     <div className="knockedOutDiv">
-                        <img alt="" src={blackImage} onClick={BlackKnockedOutClicked} />
+                        <img alt="" src={blackImage} />
                         <div>{knockedOutPieces[0]}</div>
                     </div>
                     <div className="knockedOutDiv">
-                        <img alt="" src={whiteImage} onClick={WhiteKnockedOutClicked} />
+                        <img alt="" src={whiteImage} />
                         <div>{knockedOutPieces[1]}</div>
                     </div>
                 </div>
                 <div className="knockedOutPiecesDivHolder">
-                    <div className={activeThrow === 0 ? "ActiveDiceDiv": "DiceDiv"}>
-                        <div onClick={() => ManageActiveThrow(0)}>{availableThrows[0]}</div>
+                    <div className={activeThrow === 0 ? "ActiveDiceDiv knockedOutDiv": "DiceDiv knockedOutDiv"}>
+                        <img alt="" src={dice1Img} onClick={() => ManageActiveThrow(0)} />
                     </div>
-                    <div className={activeThrow === 1 ? "ActiveDiceDiv": "DiceDiv"}>
-                        <div onClick={() => ManageActiveThrow(1)}>{availableThrows[1]}</div>
+                    <div className={activeThrow === 1 ? "ActiveDiceDiv knockedOutDiv": "DiceDiv knockedOutDiv"}>
+                        <img alt="" src={dice2Img} onClick={() => ManageActiveThrow(1)} />
                     </div>
                 </div>
                 <div className="passDiv">
-                    <Button variant='outlined' onClick={() => PassHandlingToOther()}>Pass</Button>
+                    <Button variant='outlined' sx={{color: "black", borderColor: "black"}}nClick={() => PassHandlingToOther()}>Pass</Button>
                 </div>
             </div>
             <div>

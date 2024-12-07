@@ -104,7 +104,7 @@ const GamePage = () => {
         const conn = peerInstance.current.connect(opponent.PeerId);
         
         conn.on('open', () => {
-            console.log('Connected to:', opponent[0]);
+            console.log('Connected to:', opponent.PeerId);
             setConnectionToWrite(conn);
         });
       
@@ -129,7 +129,7 @@ const GamePage = () => {
             {
                 connectionToWrite === null || connectionToListen === null?
                 <div className="container">
-                    <CircularProgress />
+                    <CircularProgress style={{ color: "black"}}/>
                 </div> :
                 <GameBoard write={connectionToWrite} listen={connectionToListen} opponentName={opponent.Name} isBlack={opponent.IsBlack}/>
             }

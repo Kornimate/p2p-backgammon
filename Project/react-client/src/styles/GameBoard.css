@@ -59,15 +59,12 @@
     min-width: 800px;
 }
 
-.DiceDiv {
-    width: 66px;
-    height: 66px;
+.DiceDiv > img {
+    background-color: white;
 }
 
-.ActiveDiceDiv {
-    width: 66px;
-    height: 66px;
-    background-color: gray;
+.ActiveDiceDiv > img {
+    background-color: darkgray;
 }
 
 .indicatorImage {
