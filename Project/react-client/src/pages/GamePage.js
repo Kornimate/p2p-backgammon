@@ -18,6 +18,8 @@ const GamePage = () => {
     const [peerId, setPeerId] = useState(""); // Your custom ID
     const peerInstance = useRef(null);
 
+    const [timer, setTimer] = useState(null);
+
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -63,11 +65,22 @@ const GamePage = () => {
         .build();
 
         setConnectionSignalR(signalRConn);
+
+        if(timer !== null){
+            clearTimeout(timer);
+            setTimer(null);
+        }
+
+        setTimer(setTimeout(() => {
+            alert("Time limit in queue exceeded! Navigating back to home page.")
+            navigate("/game");
+        }, 30000));
             
         },[peerId]);
 
     useEffect(() => {
         if(connectionSignalR && peerId){
+
             connectionSignalR.on("SendMessage", data => {
                 console.log(`Sent: ${data}`);
             });
@@ -86,6 +99,8 @@ const GamePage = () => {
                 const opponentData = JSON.parse(data);
                 console.log(opponentData)
                 setOpponent(opponentData);
+                clearTimeout(timer);
+                setTimer(null);
                 connectionSignalR.stop();
             });
     
@@ -122,7 +137,11 @@ const GamePage = () => {
         };
 
 
-    }, [opponent])
+    }, [opponent]);
+
+    useEffect(() => {
+        // nothing to do
+    }, [timer])
 
     return (
         <div>
