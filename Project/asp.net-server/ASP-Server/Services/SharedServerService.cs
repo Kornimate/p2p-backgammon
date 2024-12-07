@@ -24,16 +24,32 @@ namespace ASP_Server.Services
 
         public async Task<bool> RemoveFromCollectionAsync(string id)
         {
-            bool res = usersInGroups.TryRemove(id, out _);
+            bool res = true;
 
-            WriteCollectionToConsole($"user removed from collection: {id} {{{res}}}", usersInGroups);
+            lock (usersInGroups)
+            {
+                var usersForRemoval = usersInGroups.Where(x => x.Key.Contains(id));
+
+                foreach(var data in usersForRemoval)
+                {
+                    res = res && usersInGroups.TryRemove(data);
+                }
+            }
+
+
+            WriteCollectionToConsole($"user removed from collection: {id} {res}", usersInGroups);
 
             lock (aloneUsers)
             {
-                res = aloneUsers.Remove(id);
+                var usersForRemoval = aloneUsers.Where(x => x.Key.Contains(id));
+
+                foreach (var data in usersForRemoval)
+                {
+                    res = res && aloneUsers.Remove(data.Key);
+                }
             }
 
-            WriteCollectionToConsole($"user removed from alones: {id} {{{res}}}", usersInGroups);
+            WriteCollectionToConsole($"user removed from alones: {id} {{{res}}}", aloneUsers);
 
             return await Task.FromResult(res);
         }

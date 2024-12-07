@@ -306,7 +306,7 @@ const GameBoard = ({ write, listen, opponentName, isBlack}) => {
             if(isActive){
                 PassHandlingToOther()
             }
-        }, 12000));
+        }, 20000));
     }
 
     function SetOpponentTimer(){
@@ -407,23 +407,6 @@ const GameBoard = ({ write, listen, opponentName, isBlack}) => {
         setIsActive(false);
         SetOpponentTimer();
     }, [])
-
-    useEffect(() => {
-        const handleBeforeUnload = (event) => {
-          event.preventDefault();
-
-          listen.close();
-          write.close();
-
-          event.returnValue = "";
-        };
-    
-        window.addEventListener("beforeunload", handleBeforeUnload);
-    
-        return () => {
-          window.removeEventListener("beforeunload", handleBeforeUnload);
-        };
-      }, []);
 
     useEffect(() => {
         if(!incomingMessage)

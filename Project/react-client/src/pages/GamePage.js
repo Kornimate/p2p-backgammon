@@ -52,24 +52,6 @@ const GamePage = () => {
     }, []);
 
     useEffect(() => {
-        const handleBeforeUnload = (event) => {
-          event.preventDefault();
-
-            if(connectionSignalR){
-                connectionSignalR.stop();
-            }
-
-          event.returnValue = "";
-        };
-    
-        window.addEventListener("beforeunload", handleBeforeUnload);
-    
-        return () => {
-          window.removeEventListener("beforeunload", handleBeforeUnload);
-        };
-      }, []);
-
-    useEffect(() => {
 
         if(!peerId)
             return;
@@ -91,6 +73,11 @@ const GamePage = () => {
 
         setTimer(setTimeout(() => {
             alert("Time limit in queue exceeded! Navigating back to home page.")
+            
+            if(connectionSignalR !== null){
+                connectionSignalR.stop();
+            }
+            
             navigate("/game");
         }, 30000));
             
