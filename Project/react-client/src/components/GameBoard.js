@@ -132,6 +132,11 @@ const GameBoard = ({ write, listen, opponentName, isBlack}) => {
                 }
             }
 
+            if(board[index][GetPositionInBoard()] === 0){
+                setOpen(true);
+                return;
+            }
+
             const tempBoard = [...board]
             tempBoard[index][GetPositionInBoard()]--;
             setBoard(tempBoard);
@@ -160,8 +165,6 @@ const GameBoard = ({ write, listen, opponentName, isBlack}) => {
         setBoard(tempBoard);
 
         PostOpponentNewStep(index, availableThrows[activeThrow]);
-
-        CheckIsGameEnded();
 
         DecreaseAvailableThrows();
     }
@@ -192,21 +195,20 @@ const GameBoard = ({ write, listen, opponentName, isBlack}) => {
 
     function CheckIsGameEnded(){
         let sum = 0;
-
         if(isBlack){
-            for(let i=18;i<24;i++){
+            for(let i=0;i<18;i++){
                 sum += board[i][0];
             }
 
-            if(sum >= 15){
+            if(sum === 0){
                 setIsBearingOff(true);
             }
         } else {
-            for(let i=0;i<6;i++){
+            for(let i=6;i<24;i++){
                 sum += board[i][1];
             }
 
-            if(sum >= 15){
+            if(sum === 0){
                 setIsBearingOff(true);
             }
         }
@@ -462,6 +464,10 @@ const GameBoard = ({ write, listen, opponentName, isBlack}) => {
         //Nothing to do, just force update
     }, [opponentTimer, selfTimer])
 
+    useEffect(() => {
+        CheckIsGameEnded();
+    }, [board])
+
     const action = (
         <Fragment>
           <IconButton
@@ -542,7 +548,7 @@ const GameBoard = ({ write, listen, opponentName, isBlack}) => {
                     </div>
                 </div>
                 <div className="passDiv">
-                    <Button variant='outlined' sx={{color: "black", borderColor: "black"}}nClick={() => PassHandlingToOther()}>Pass</Button>
+                    <Button variant='outlined' sx={{color: "black", borderColor: "black"}} onClick={() => PassHandlingToOther()}>Pass</Button>
                 </div>
             </div>
             <div>

@@ -80,12 +80,12 @@ export default function SignIn(props) {
     const data = new FormData(event.currentTarget);
 
     const postData = {
-      email: data.get('email'),
-      password: data.get('password')
+      // email: data.get('email'),
+      // password: data.get('password')
+      email: "admin@test.com",
+      password: "Admin!1234"
     };
     
-    // email: "admin@test.com",
-    // password: "Admin!1234",
 
     try{
       const response = await axios.post("http://localhost:8080/api/auth/login", postData);
@@ -104,7 +104,7 @@ export default function SignIn(props) {
     const email = document.getElementById('email');
     const password = document.getElementById('password');
 
-    // return true;
+    return true;
 
     let isValid = true;
 
